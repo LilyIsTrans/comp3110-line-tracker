@@ -21,7 +21,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release]
-        c_compiler: [gcc, clang, "C:/Program Files/LLVM/bin/clang.exe"]
+        c_compiler: [gcc, clang, "'C:/Program Files/LLVM/bin/clang.exe'"]
         #toolchain: ['-DCMAKE_TOOLCHAIN_FILE="CMakeToolchain.cmake"', '']
         include:
           - os: windows-latest
