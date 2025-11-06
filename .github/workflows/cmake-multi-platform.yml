@@ -67,6 +67,7 @@ jobs:
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -T"LLVM-vs2017"
         -S ${{ github.workspace }}
 
     - name: Build
