@@ -54,11 +54,7 @@ jobs:
         $installerPath = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products Microsoft.VisualStudio.Product.BuildTools -property installationPath
         $installerExe = Join-Path $installerPath "vs_installer.exe"
 
-        & $installerExe modify `
-          --installPath "$installerPath" `
-          --add Microsoft.VisualStudio.Component.VC.Llvm.Clang `
-          --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset`
-          --passive --norestart
+        & $installerExe modify --installPath "$installerPath" --add Microsoft.VisualStudio.Component.VC.Llvm.Clang --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset --passive --norestart
           
     
     - name: Set reusable strings
