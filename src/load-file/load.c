@@ -112,8 +112,8 @@ void unload_file(struct LoadedFile *file) {
 
 
 struct LoadedFile {
-  const char* const data;
-  const size_t length;
+  const char* data;
+  size_t length;
 };
 struct LoadedFile* load_from_filename(const char* const filename) {
   FILE* file = fopen(filename, "r");
@@ -165,7 +165,7 @@ struct LoadedFile* load_from_filename(const char* const filename) {
 
   fclose(file);
 
-  struct LoadedFile output_data = {mapping, filesize};
+  struct LoadedFile output_data = {data, filesize};
   struct LoadedFile *output = malloc(sizeof(struct LoadedFile));
   *output = output_data;
   return output;
