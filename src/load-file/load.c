@@ -34,14 +34,14 @@ bool equal(Substring a, Substring b) {
 #include <errno.h>
 
 struct LoadedFile {
-  const char* const data;
-  const size_t length: SIZE_WIDTH - 1;
+  const char* data;
+  size_t length: SIZE_WIDTH - 1;
   // If true, file is `mmap`ed, and must be `munmap`ed to cleanup.
   // If false, file is `malloc`ed, and must be `free`d to cleanup.
-  const bool mapped: 1;
+  bool mapped: 1;
 };
 
-struct LoadedFile load_from_filename(const char* const filename) {
+struct LoadedFile* load_from_filename(const char* const filename) {
   int filedesc = open(filename, O_RDONLY);
   // Set the cursor to end of file and save the current cursor. We don't actually care about the cursor, it's just the easiest way to determine file size.
   size_t len = lseek(filedesc, 0, SEEK_END);
@@ -89,16 +89,20 @@ struct LoadedFile load_from_filename(const char* const filename) {
     }
     
   }
-  struct LoadedFile output = {mapping, len, mapped};
+  struct LoadedFile output_data = {mapping, len, mapped};
+  struct LoadedFile *output = malloc(sizeof(struct LoadedFile));
+  *output = output_data;
   return output;
 }
 
-void unload_file(struct LoadedFile file) {
-  if (file.mapped) {
-    munmap((void*)file.data, file.length);
+void unload_file(struct LoadedFile *file) {
+  if (file->mapped) {
+    munmap((void*)file->data, file->length);
+    free(file);
   }
   else {
-    free((void*)file.data);
+    free((void*)file->data);
+    free(file);
   }
 }
 
@@ -111,7 +115,7 @@ struct LoadedFile {
   const char* const data;
   const size_t length;
 };
-struct LoadedFile load_from_filename(const char* const filename) {
+struct LoadedFile* load_from_filename(const char* const filename) {
   FILE* file = fopen(filename, "r");
   if (file == NULL) {
     fprintf(stderr, "Failed to open file '%s', reason: '%s'.\n", filename, strerror(errno));
@@ -161,16 +165,23 @@ struct LoadedFile load_from_filename(const char* const filename) {
 
   fclose(file);
 
-  struct LoadedFile output = {data, filesize};
+  struct LoadedFile output_data = {mapping, len};
+  struct LoadedFile *output = malloc(sizeof(struct LoadedFile));
+  *output = output_data;
   return output;
   
 }
 
+void unload_file(struct LoadedFile *file) {
+  free((void*)file->data);
+  free(file);
+}
+
 #endif
 
-inline const char* get_data_ptr(struct LoadedFile file) [[unsequenced]] {
-  return file.data;
+const char* get_data_ptr(struct LoadedFile* file) [[unsequenced]] {
+  return file->data;
 }
-inline size_t get_size(struct LoadedFile file) [[unsequenced]] {
-  return file.length;
+size_t get_size(struct LoadedFile* file) [[unsequenced]] {
+  return file->length;
 }

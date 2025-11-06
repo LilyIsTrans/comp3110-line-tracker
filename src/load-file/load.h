@@ -42,18 +42,18 @@ struct LoadedFile;
   * If the `data` member of the returned LoadedFile is `NULL`, and the `length`
   * member is `0`, then the file was an empty file (and no memory was allocated).
   */
-struct LoadedFile load_from_filename(const char* const filename);
+struct LoadedFile* load_from_filename(const char* const filename);
 
 /**
-  * Frees up whatever resources backed the `LoadedFile`. After this function is called, the passed `LoadedFile` is invalid and must not be used.
+  * Frees up whatever resources backed the `LoadedFile`. After this function is called, the passed pointer to `LoadedFile` is invalid and must not be used.
   */
-void unload_file(struct LoadedFile);
+void unload_file(struct LoadedFile*);
 
 /**
   * Returns the `data` pointer of the given LoadedFile. 
   */
-inline const char* get_data_ptr(struct LoadedFile) [[unsequenced]];
+const char* get_data_ptr(struct LoadedFile*) [[unsequenced]];
 /**
   * Returns the filesize of the given LoadedFile. 
   */
-inline size_t get_size(struct LoadedFile) [[unsequenced]];
+size_t get_size(struct LoadedFile*) [[unsequenced]];
