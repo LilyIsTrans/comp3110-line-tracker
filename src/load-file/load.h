@@ -34,10 +34,7 @@ bool equal(Substring, Substring);
   * Owns the entire contents of a loaded file.
   *
   */
-struct LoadedFile {
-  const char* const data;
-  const size_t length;
-};
+struct LoadedFile;
 
 /**
   * Attempts to create a new LoadedFile from the given filename.
@@ -52,3 +49,7 @@ struct LoadedFile {
   */
 struct LoadedFile load_from_filename(const char* const filename);
 
+/**
+  * Frees up whatever resources backed the `LoadedFile`. After this function is called, the passed `LoadedFile` is invalid and must not be used.
+  */
+void unload_file(struct LoadedFile);
