@@ -51,15 +51,18 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Visual Studio components
+    - name: Install Clang
       if: runner.os == 'Windows'
-      shell: powershell
-      run: |
-        $installerPath = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products Microsoft.VisualStudio.Product.BuildTools -property installationPath
-        $installerExe = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe"
+      #shell: powershell
+      #run: |
+      #  $installerPath = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products Microsoft.VisualStudio.Product.BuildTools -property installationPath
+      #  $installerExe = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe"
 
-        & $installerExe modify --installPath "$installerPath" --add Microsoft.VisualStudio.Component.VC.Llvm.Clang --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset --passive --norestart
-          
+      #  & $installerExe modify --installPath "$installerPath" --add Microsoft.VisualStudio.Component.VC.Llvm.Clang --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset --passive --norestart
+      uses: KyleMayes/install-llvm-action@v2.0.8
+      with:
+          # The version of LLVM and Clang binaries to install.
+        version: "10"
     
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
