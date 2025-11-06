@@ -3,9 +3,11 @@ cmake_minimum_required(VERSION 3.23)
 project(line-tracker)
 
 include(CTest)
-
+SET(CMAKE_C_EXTENSIONS OFF)
+SET(CMAKE_C_STANDARD 23)
+SET(CMAKE_C_STANDARD_REQUIRED ON)
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O2 -std=c23 -march=native")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O2 -march=native")
 
 add_library(tokenizer_test src/tokenizer/tokenizer.c src/tokenizer/tokenizer.h)
 add_library(load_file OBJECT src/load-file/load.c src/load-file/load.h)
