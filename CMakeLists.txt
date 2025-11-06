@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.23)
 
-project(line-tracker)
+project(line-tracker C)
 
 include(CTest)
 SET(CMAKE_C_EXTENSIONS OFF)
