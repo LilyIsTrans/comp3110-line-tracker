@@ -22,6 +22,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release]
         c_compiler: [gcc, clang]
+        toolchain: ['-T"LLVM-vs2017"', '']
         include:
           - os: windows-latest
             c_compiler: clang
@@ -36,6 +37,10 @@ jobs:
             c_compiler: cl
           - os: macos-latest
             c_compiler: gcc
+          - os: ubuntu-latest
+            toolchain: '-T"LLVM-vs2017"'
+          - os: macos-latest
+            toolchain: '-T"LLVM-vs2017"'
 
     steps:
     - uses: actions/checkout@v4
