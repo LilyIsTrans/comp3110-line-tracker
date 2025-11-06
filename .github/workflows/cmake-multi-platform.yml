@@ -62,7 +62,7 @@ jobs:
       uses: KyleMayes/install-llvm-action@v2.0.8
       with:
           # The version of LLVM and Clang binaries to install.
-        version: "10"
+        version: "18"
     
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
