@@ -165,7 +165,7 @@ struct LoadedFile* load_from_filename(const char* const filename) {
 
   fclose(file);
 
-  struct LoadedFile output_data = {mapping, len};
+  struct LoadedFile output_data = {mapping, filesize};
   struct LoadedFile *output = malloc(sizeof(struct LoadedFile));
   *output = output_data;
   return output;
