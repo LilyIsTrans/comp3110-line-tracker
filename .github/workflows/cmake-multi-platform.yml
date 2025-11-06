@@ -21,11 +21,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release]
-        c_compiler: [gcc, clang, clang-cl]
-        toolchain: ['-DCMAKE_TOOLCHAIN_FILE="CMakeToolchain.cmake"', '']
+        c_compiler: [gcc, clang, "C:/Program Files/LLVM/bin/clang.exe"]
+        #toolchain: ['-DCMAKE_TOOLCHAIN_FILE="CMakeToolchain.cmake"', '']
         include:
           - os: windows-latest
-            c_compiler: clang-cl
+            c_compiler: "C:/Program Files/LLVM/bin/clang.exe"
           - os: ubuntu-latest
             c_compiler: gcc
           - os: ubuntu-latest
@@ -36,17 +36,17 @@ jobs:
           - os: windows-latest
             c_compiler: clang
           - os: ubuntu-latest
-            c_compiler: clang-cl
+            c_compiler: "C:/Program Files/LLVM/bin/clang.exe"
           - os: macos-latest
             c_compiler: gcc
           - os: macos-latest
-            c_compiler: clang-cl
-          - os: ubuntu-latest
-            toolchain: '-DCMAKE_TOOLCHAIN_FILE="CMakeToolchain.cmake"'
-          - os: macos-latest
-            toolchain: '-DCMAKE_TOOLCHAIN_FILE="CMakeToolchain.cmake"'
-          - os: windows-latest
-            toolchain: ''
+            c_compiler: "C:/Program Files/LLVM/bin/clang.exe"
+          #- os: ubuntu-latest
+          #  toolchain: '-DCMAKE_TOOLCHAIN_FILE="CMakeToolchain.cmake"'
+          #- os: macos-latest
+          #  toolchain: '-DCMAKE_TOOLCHAIN_FILE="CMakeToolchain.cmake"'
+          #- os: windows-latest
+          #  toolchain: ''
 
     steps:
     - uses: actions/checkout@v4
