@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 #include <stdlib.h>
 
 /**
@@ -16,7 +17,7 @@ typedef struct {
 /**
   * \brief Determines the length (number of `char`s) in a Substring.
   *
-  * \param The substring whose length is to be determined.
+  * \param[in] 1 The substring whose length is to be determined.
   */
 inline size_t length(Substring) [[unsequenced]];
 
@@ -28,3 +29,26 @@ inline size_t length(Substring) [[unsequenced]];
   * \param[in] 2 The other substring to be compared
   */
 bool equal(Substring, Substring);
+
+/**
+  * Owns the entire contents of a loaded file.
+  *
+  */
+struct LoadedFile {
+  const char* const data;
+  const size_t length;
+};
+
+/**
+  * Attempts to create a new LoadedFile from the given filename.
+  * Makes every attempt to do as little work as possible in this process.
+  * If the `data` member of the returned LoadedFile is `NULL`, and the `length`
+  * member is `0`, then the file was an empty file (and no memory was allocated).
+  * If the `data` member of the returned LoadedFile is `NULL` and the `length`
+  * member is `SIZE_MAX`, then something went wrong (most likely, the filename
+  * was incorrect. Most operating systems actually can't fail to map a file into
+  * memory since they have facilities for redirecting memory addresses to the actual
+  * data on disk.)
+  */
+struct LoadedFile load_from_filename(const char* const filename);
+
