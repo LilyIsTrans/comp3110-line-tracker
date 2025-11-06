@@ -41,12 +41,12 @@ jobs:
             c_compiler: gcc
           - os: macos-latest
             c_compiler: clang-cl
-          - os: ubuntu-latest
-            toolchain: '-T"LLVM-vs2022"'
-          - os: macos-latest
-            toolchain: '-T"LLVM-vs2022"'
-          - os: windows-latest
-            toolchain: ''
+          #- os: ubuntu-latest
+          #  toolchain: '-T"LLVM-vs2022"'
+          #- os: macos-latest
+          #  toolchain: '-T"LLVM-vs2022"'
+          #- os: windows-latest
+          #  toolchain: ''
 
     steps:
     - uses: actions/checkout@v4
