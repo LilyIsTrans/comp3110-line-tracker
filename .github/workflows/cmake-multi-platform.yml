@@ -47,17 +47,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Clang
-      if: runner.os == 'Windows'
-  # You may pin to the exact commit or the version.
-  # uses: egor-tensin/setup-clang@ef434b41eb33a70396fb336b1bae39c76d740c3d
-      uses: KyleMayes/install-llvm-action@v2
-      with:
-        # Version to install
-        version: "10"
-        # Target platform
-        arch: x64
-        env: true
+    - name: Install Visual Studio components
+      shell: powershell
+      run: |
+        $installerPath = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products Microsoft.VisualStudio.Product.BuildTools -property installationPath
+        $installerExe = Join-Path $installerPath "vs_installer.exe"
+
+        & $installerExe modify `
+          --installPath "$installerPath" `
+          --add Microsoft.VisualStudio.Component.VC.Llvm.Clang `
+          --add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset`
+          --passive --norestart
           
     
     - name: Set reusable strings
