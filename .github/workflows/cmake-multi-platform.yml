@@ -22,7 +22,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release]
         c_compiler: [gcc, clang, clang-cl]
-        toolchain: ['-DCMAKE_TOOLCHAIN_FILE:FILEPATH="CMakeToolchain.cmake"', '']
+        toolchain: ['-DCMAKE_TOOLCHAIN_FILE="CMakeToolchain.cmake"', '']
         include:
           - os: windows-latest
             c_compiler: clang-cl
@@ -42,9 +42,9 @@ jobs:
           - os: macos-latest
             c_compiler: clang-cl
           - os: ubuntu-latest
-            toolchain: '-DCMAKE_TOOLCHAIN_FILE:FILEPATH="CMakeToolchain.cmake"'
+            toolchain: '-DCMAKE_TOOLCHAIN_FILE="CMakeToolchain.cmake"'
           - os: macos-latest
-            toolchain: '-DCMAKE_TOOLCHAIN_FILE:FILEPATH="CMakeToolchain.cmake"'
+            toolchain: '-DCMAKE_TOOLCHAIN_FILE="CMakeToolchain.cmake"'
           - os: windows-latest
             toolchain: ''
 
