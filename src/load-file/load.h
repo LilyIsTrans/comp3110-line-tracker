@@ -41,11 +41,6 @@ struct LoadedFile;
   * Makes every attempt to do as little work as possible in this process.
   * If the `data` member of the returned LoadedFile is `NULL`, and the `length`
   * member is `0`, then the file was an empty file (and no memory was allocated).
-  * If the `data` member of the returned LoadedFile is `NULL` and the `length`
-  * member is `SIZE_MAX`, then something went wrong (most likely, the filename
-  * was incorrect. Most operating systems actually can't fail to map a file into
-  * memory since they have facilities for redirecting memory addresses to the actual
-  * data on disk.)
   */
 struct LoadedFile load_from_filename(const char* const filename);
 
@@ -53,3 +48,12 @@ struct LoadedFile load_from_filename(const char* const filename);
   * Frees up whatever resources backed the `LoadedFile`. After this function is called, the passed `LoadedFile` is invalid and must not be used.
   */
 void unload_file(struct LoadedFile);
+
+/**
+  * Returns the `data` pointer of the given LoadedFile. 
+  */
+inline const char* get_data_ptr(struct LoadedFile) [[unsequenced]];
+/**
+  * Returns the filesize of the given LoadedFile. 
+  */
+inline size_t get_size(struct LoadedFile) [[unsequenced]];
