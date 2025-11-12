@@ -27,7 +27,7 @@ bool equal(Substring a, Substring b) {
   }
 }
 
-#if !defined(__linux__) || !defined(__linux)
+#if defined(__linux__) || defined(__linux)
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
