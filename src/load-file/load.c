@@ -116,7 +116,7 @@ struct LoadedFile {
   size_t length;
 };
 struct LoadedFile* load_from_filename(const char* const filename) {
-  FILE* file = fopen(filename, "r");
+  FILE* file = fopen(filename, "rb");
   if (file == NULL) {
     fprintf(stderr, "Failed to open file '%s', reason: '%s'.\n", filename, strerror(errno));
     exit(EXIT_FAILURE);
