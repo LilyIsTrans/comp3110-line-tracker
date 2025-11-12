@@ -10,13 +10,13 @@ int main(int argc, char** argv) {
     size_t length = get_size(file);
     size_t expected_length; 
     if (sscanf(argv[i + 1], "%zu", &expected_length) != 1) {
-      fputs("INVALID COMMAND LINE", stderr);
+      puts("INVALID COMMAND LINE");
       exit(EXIT_FAILURE);
     }
     if (length != expected_length) {
       exit_code = EXIT_FAILURE;
     }
-    fprintf(stderr, "File '%s' (number %d) was measured %zu bytes, expected %zu.\n", argv[i], i / 2, length, expected_length);
+    printf("File '%s' (number %d) was measured %zu bytes, expected %zu.\n", argv[i], i / 2, length, expected_length);
   }
   return exit_code;
   
