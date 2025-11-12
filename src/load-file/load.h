@@ -19,7 +19,7 @@ typedef struct {
   *
   * \param[in] 1 The substring whose length is to be determined.
   */
-inline size_t length(Substring) [[unsequenced]];
+inline size_t length(Substring);
 
 /**
   * \brief Compares two substrings to determine if they are exactly equal
@@ -52,8 +52,8 @@ void unload_file(struct LoadedFile*);
 /**
   * Returns the `data` pointer of the given LoadedFile. 
   */
-const char* get_data_ptr(struct LoadedFile*) [[unsequenced]];
+const char* get_data_ptr(struct LoadedFile*) ;
 /**
   * Returns the filesize of the given LoadedFile. 
   */
-size_t get_size(struct LoadedFile*) [[unsequenced]];
+size_t get_size(struct LoadedFile*) ;

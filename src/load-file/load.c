@@ -6,7 +6,7 @@
 
 
 
-inline size_t length(Substring str) [[unsequenced]] {
+inline size_t length(Substring str)  {
   return str.end - str.start;
 }
 
@@ -179,9 +179,9 @@ void unload_file(struct LoadedFile *file) {
 
 #endif
 
-const char* get_data_ptr(struct LoadedFile* file) [[unsequenced]] {
+const char* get_data_ptr(struct LoadedFile* file)  {
   return file->data;
 }
-size_t get_size(struct LoadedFile* file) [[unsequenced]] {
+size_t get_size(struct LoadedFile* file)  {
   return file->length;
 }
