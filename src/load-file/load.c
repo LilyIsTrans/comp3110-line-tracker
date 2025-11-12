@@ -35,7 +35,7 @@ bool equal(Substring a, Substring b) {
 
 struct LoadedFile {
   const char* data;
-  size_t length: SIZE_WIDTH - 1;
+  size_t length: sizeof(size_t) * 8 - 1;
   // If true, file is `mmap`ed, and must be `munmap`ed to cleanup.
   // If false, file is `malloc`ed, and must be `free`d to cleanup.
   bool mapped: 1;

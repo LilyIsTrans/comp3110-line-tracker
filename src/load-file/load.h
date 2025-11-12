@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <stdlib.h>
-
+#include <stdbool.h>
 /**
   * Holds a reference to a (POTENTIALLS NON NULL TERMINATED) substring.
   * 
