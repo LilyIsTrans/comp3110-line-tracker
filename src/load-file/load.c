@@ -6,7 +6,7 @@
 
 
 
-inline size_t length(Substring str)  {
+size_t length(Substring str)  {
   return str.end - str.start;
 }
 
@@ -27,7 +27,7 @@ bool equal(Substring a, Substring b) {
   }
 }
 
-#if !defined(__linux__) || !defined(__linux)
+#if (defined(__linux__) || defined(__linux)) && !defined(FORCE_PORTABLE_FALLBACK)
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -121,13 +121,13 @@ struct LoadedFile* load_from_filename(const char* const filename) {
     fprintf(stderr, "Failed to open file '%s', reason: '%s'.\n", filename, strerror(errno));
     exit(EXIT_FAILURE);
   }
-  if (!fseek(file, 0, SEEK_END)) {
-    fprintf(stderr, "Failed to seek to end of file '%s'. Either your libc is broken or your computer is haunted. Officially, the error was '%s'.\n", filename, strerror(errno));
+  if (fseek(file, 0, SEEK_END)) {
+    fprintf(stderr, "Failed to seek to end of file '%s'. Either your libc is broken or your computer is haunted. Officially, the error was '%s'. The stream error indicator was %d (0 indicates no error).\n", filename, strerror(errno), ferror(file));
     exit(EXIT_FAILURE);
   }
   int filesize_temp = ftell(file);
   if (filesize_temp == -1) {
-    fprintf(stderr, "Failed to read cursor position for file '%s'. Either your libc is broken or your computer is haunted. Officially, the error was '%s'.\n", filename, strerror(errno));
+    fprintf(stderr, "Failed to read cursor position for file '%s'. Either your libc is broken or your computer is haunted. Officially, the error was '%s'. The stream error indicator was %d (0 indicates no error).\n", filename, strerror(errno), ferror(file));
     exit(EXIT_FAILURE);
   }
   size_t filesize = filesize_temp;
@@ -138,15 +138,21 @@ struct LoadedFile* load_from_filename(const char* const filename) {
     exit(EXIT_FAILURE);
   }
 
+  if (fseek(file, 0, SEEK_SET)) {
+    fprintf(stderr, "Failed to seek to start of file '%s'. Either your libc is broken or your computer is haunted. Officially, the error was '%s'. The stream error indicator was %d (0 indicates no error).\n", filename, strerror(errno), ferror(file));
+    exit(EXIT_FAILURE);
+  }
+
   size_t bytes_read = 0;
 
   while (true) {
       size_t this_read = fread(data + bytes_read, 1, filesize - bytes_read, file);
+      fprintf(stderr, "Read %zu bytes from file '%s'\n.", this_read, filename);
       if (ferror(file)) {
-        fprintf(stderr, "Failed to read from file '%s' at position %zu with %zu bytes to go because '%s'.\n", filename, bytes_read, filesize - bytes_read, strerror(ferror(file)));
+        fprintf(stderr, "Failed to read from file '%s' at position %zu with %zu bytes to go because '%s'. The stream error indicator was %d (0 indicates no error).\n", filename, bytes_read, filesize - bytes_read, strerror(errno), ferror(file));
         exit(EXIT_FAILURE);
       }
-      else if (feof(file) && bytes_read == filesize) {
+      else if (bytes_read + this_read == filesize) {
         break;
       }
       else if (feof(file)) {
