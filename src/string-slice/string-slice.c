@@ -1,4 +1,6 @@
 #include "string-slice.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 size_t length(Substring str)  {
@@ -20,4 +22,31 @@ bool equal(Substring a, Substring b) {
   else {
     return !memcmp(a.start, b.start, len);
   }
+}
+
+inline struct SubstringArray* append_to_substring_array(struct SubstringArray* array, const Substring str) {
+  if (array->len == array->capacity) {
+    struct SubstringArray* new_array = realloc(array, sizeof(struct SubstringArray) + array->capacity * 2 * sizeof(Substring));
+    if (!new_array) {
+      fprintf(stderr, "Failed to realloc substring array of length %zu!\n", array->capacity);
+      exit(EXIT_FAILURE);
+    }
+    array = new_array;
+  }
+  array->array[array->len] = str;
+  array->len += 1;
+  return array;
+}
+struct SubstringArray* lines(Substring haystack) {
+  struct SubstringArray* output = new_substring_array(0);
+  Substring last_line_so_far = haystack;
+  last_line_so_far.end = last_line_so_far.start;
+  while (last_line_so_far.end < haystack.end) {
+    if (*last_line_so_far.end == '\n') {
+      output = append_to_substring_array(output, last_line_so_far);
+      last_line_so_far.start = last_line_so_far.end + 1;
+    }
+    last_line_so_far.end++;
+  }
+  return output;
 }

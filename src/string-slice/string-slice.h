@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 
 /**
@@ -14,8 +15,8 @@
   * the substring).
   */
 typedef struct {
-  const char* const start;
-  const char* const end;
+  const char* start;
+  const char* end;
 } Substring;
 
 /**
@@ -40,23 +41,28 @@ bool equal(Substring, Substring);
   */
 struct SubstringArray {
   size_t len;
+  size_t capacity;
   Substring array[];
 };
 
 
 /**
   * \brief Allocates a new `SubstringArray` with a certain array size.
-  * To deallocate the array, just `free` it. This function is a thin wrapper on
+  * To deallocate the array, just `free` it. This function is a wrapper on
   * `malloc` to keep you from forgetting to add the size of the struct.
   */
-inline struct SubstringArray* new_substring_array(const size_t size) {
-  return malloc(sizeof(struct SubstringArray) + size * sizeof(Substring));
+inline struct SubstringArray* new_substring_array(const size_t capacity) {
+  struct SubstringArray* output = malloc(sizeof(struct SubstringArray) + capacity * sizeof(Substring));
+  output->len = 0;
+  output->capacity = capacity;
+  memset(output->array, 0, capacity);
+  return output;
 }
 
 
 /**
   * \brief Returns an array of substrings from the haystack holding each line in the haystack.
-  * Does not include trailing `'\n'` or `'\r'` characters, but other whitespace is treated as
+  * Does not include trailing `'\n'` characters, but other whitespace is treated as
   * though it were regular text. Empty lines will correspond to empty substrings, they will
   * not be omitted from the array.
   */
