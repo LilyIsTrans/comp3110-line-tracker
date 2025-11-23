@@ -1,4 +1,5 @@
 #include "string-slice.h"
+#include <string.h>
 
 size_t length(Substring str)  {
   return str.end - str.start;
