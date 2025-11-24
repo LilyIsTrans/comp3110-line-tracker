@@ -23,8 +23,16 @@ bool equal(Substring a, Substring b) {
     return !memcmp(a.start, b.start, len);
   }
 }
+struct SubstringArray *new_substring_array(const size_t capacity) {
+  struct SubstringArray *output =
+      malloc(sizeof(struct SubstringArray) + capacity * sizeof(Substring));
+  output->len = 0;
+  output->capacity = capacity;
+  memset(output->array, 0, capacity);
+  return output;
+}
 
-inline struct SubstringArray* append_to_substring_array(struct SubstringArray* array, const Substring str) {
+struct SubstringArray* append_to_substring_array(struct SubstringArray* array, const Substring str) {
   if (array->len == array->capacity) {
     struct SubstringArray* new_array = realloc(array, sizeof(struct SubstringArray) + array->capacity * 2 * sizeof(Substring));
     if (!new_array) {

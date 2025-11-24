@@ -1,3 +1,4 @@
+#pragma once
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -24,7 +25,7 @@ typedef struct {
   *
   * \param[in] 1 The substring whose length is to be determined.
   */
-inline size_t length(Substring);
+size_t length(Substring);
 
 /**
   * \brief Compares two substrings to determine if they are exactly equal
@@ -51,14 +52,7 @@ struct SubstringArray {
   * To deallocate the array, just `free` it. This function is a wrapper on
   * `malloc` to keep you from forgetting to add the size of the struct.
   */
-inline struct SubstringArray* new_substring_array(const size_t capacity) {
-  struct SubstringArray* output = malloc(sizeof(struct SubstringArray) + capacity * sizeof(Substring));
-  output->len = 0;
-  output->capacity = capacity;
-  memset(output->array, 0, capacity);
-  return output;
-}
-
+struct SubstringArray *new_substring_array(const size_t capacity);
 
 /**
   * \brief Returns an array of substrings from the haystack holding each line in the haystack.

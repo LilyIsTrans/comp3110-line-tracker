@@ -21,3 +21,4 @@ add_test(NAME LoadedFileLength COMMAND loaded_file_length_test ${CMAKE_SOURCE_DI
 
 
 add_library(string_slice OBJECT src/string-slice/string-slice.c src/string-slice/string-slice.h)
+add_executable(file_line_test ${CMAKE_SOURCE_DIR}/src/tests/unit/line-numbers.c $<TARGET_OBJECTS:string_slice>)
