@@ -18,3 +18,7 @@ add_library(load_file OBJECT src/load-file/load.c src/load-file/load.h)
 
 add_executable(loaded_file_length_test ${CMAKE_SOURCE_DIR}/src/tests/unit/loaded-file-length.c $<TARGET_OBJECTS:load_file>)
 add_test(NAME LoadedFileLength COMMAND loaded_file_length_test ${CMAKE_SOURCE_DIR}/src/tests/data/empty_file 1 ${CMAKE_SOURCE_DIR}/src/tests/data/1_byte_file 2 ${CMAKE_SOURCE_DIR}/src/tests/data/small_text_file 27)
+
+
+add_library(string_slice OBJECT src/string-slice/string-slice.c src/string-slice/string-slice.h)
+add_executable(file_line_test ${CMAKE_SOURCE_DIR}/src/tests/unit/line-numbers.c $<TARGET_OBJECTS:string_slice>)
