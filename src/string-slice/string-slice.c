@@ -10,6 +10,7 @@ size_t length(Substring str)  {
 
 bool equal(Substring a, Substring b) {
   size_t len;
+
   if (a.start == b.start && a.end == b.end) {
     return true;
   }
@@ -26,8 +27,10 @@ bool equal(Substring a, Substring b) {
 struct SubstringArray *new_substring_array(const size_t capacity) {
   struct SubstringArray *output =
       malloc(sizeof(struct SubstringArray) + capacity * sizeof(Substring));
+
   output->len = 0;
   output->capacity = capacity;
+
   memset(output->array, 0, capacity);
   return output;
 }
@@ -35,6 +38,7 @@ struct SubstringArray *new_substring_array(const size_t capacity) {
 struct SubstringArray* append_to_substring_array(struct SubstringArray* array, const Substring str) {
   if (array->len == array->capacity) {
     struct SubstringArray* new_array = realloc(array, sizeof(struct SubstringArray) + array->capacity * 2 * sizeof(Substring));
+    
     if (!new_array) {
       fprintf(stderr, "Failed to realloc substring array of length %zu!\n", array->capacity);
       exit(EXIT_FAILURE);
@@ -45,10 +49,12 @@ struct SubstringArray* append_to_substring_array(struct SubstringArray* array, c
   array->len += 1;
   return array;
 }
+
 struct SubstringArray* lines(Substring haystack) {
   struct SubstringArray* output = new_substring_array(0);
   Substring last_line_so_far = haystack;
   last_line_so_far.end = last_line_so_far.start;
+
   while (last_line_so_far.end < haystack.end) {
     if (*last_line_so_far.end == '\n') {
       output = append_to_substring_array(output, last_line_so_far);
