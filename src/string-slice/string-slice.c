@@ -1,4 +1,5 @@
 #include "string-slice.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -64,3 +65,47 @@ struct SubstringArray* lines(Substring haystack) {
   }
   return output;
 }
+
+
+uint32_t fnv1a_hash(Substring str) {
+  const uint32_t FNV_OFFSET_BASIS = 0x811c9dc5; // Pulled from https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV_hash_parameters
+  const uint32_t FNV_PRIME = 0x01000193; // Pulled from https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV_hash_parameters
+
+  uint32_t hash = FNV_OFFSET_BASIS;
+
+  for (; str.start < str.end; str.start++) {
+    hash ^= (uint32_t)(*str.start);
+    hash *= FNV_PRIME;
+  }
+
+  return hash;
+  
+}
+
+
+struct HashArray *new_hash_array(size_t capacity) {
+  struct HashArray *output =
+      malloc(sizeof(struct HashArray) + capacity * sizeof(uint32_t));
+
+  output->len = 0;
+  output->capacity = capacity;
+
+  memset(output->array, 0, capacity);
+  return output;
+  
+}
+struct HashArray *new_hash_array_from_substring_array(const struct SubstringArray *str_array) {
+  struct HashArray *output =
+      malloc(sizeof(struct HashArray) + str_array->len * sizeof(uint32_t));
+
+  output->len = str_array->len;
+  output->capacity = str_array->len;
+
+  for (size_t i = 0; i < str_array->len; ++i) {
+    output->array[i] = fnv1a_hash(str_array->array[i]);
+  }
+
+  return output;
+  
+}
+
