@@ -5,10 +5,12 @@
 
 int main(int argc, char** argv) {
   int exit_code = EXIT_SUCCESS;
+
   for (int i = 1; i < argc - 1; i += 2) {
     struct LoadedFile *file = load_from_filename(argv[i]);
     size_t length = get_size(file);
-    size_t expected_length; 
+    size_t expected_length;
+
     if (sscanf(argv[i + 1], "%zu", &expected_length) != 1) {
       puts("INVALID COMMAND LINE");
       exit(EXIT_FAILURE);
