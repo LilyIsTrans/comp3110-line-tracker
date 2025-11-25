@@ -96,4 +96,34 @@ struct HashArray *new_hash_array(const size_t capacity);
 struct HashArray *new_hash_array_from_substring_array(const struct SubstringArray*);
 
 
+/**
+  * \brief A hash table 
+  */
+struct SubstringHashTable; 
+
+/**
+  * \brief Allocates a new substring hash table with a given capacity.
+  * `capacity` MUST be a power of 2.
+  */
+struct SubstringHashTable *new_substring_hash_table(size_t capacity); 
+
+/**
+  * \brief Inserts `str` into `table`, reallocating the table if necessary.
+  */
+struct SubstringHashTable *insert_into_substring_hash_table(struct SubstringHashTable* table, Substring str, size_t line_number);
+
+
+/**
+  * \brief Basically just exists as the return type of getting from a `SubstringHashTable`.
+  */
+struct SimpleSizeTArray {
+  size_t size;
+  size_t* array;
+};
+
+/**
+  * \brief Returns an array containing all the line numbers `str` was recorded to appear at in the given table
+  */
+struct SimpleSizeTArray substring_hash_table_get_entry(struct SubstringHashTable* table, Substring str);
+
 
