@@ -159,7 +159,7 @@ enum LinearProbingAction {
 /// `hash` should be the result of calling `fnv1a_hash` on `str`.
 /// Tells you what to do next in the linear probing process to insert
 /// the substring `str` into this entry.
-enum LinearProbingAction check_entry_insert(struct SubstringHashTableEntry *entry, Substring str, uint32_t hash) {
+enum LinearProbingAction check_entry(struct SubstringHashTableEntry *entry, Substring str, uint32_t hash) {
   if (entry->line_numbers == NULL) {
     return INITIALIZE_THIS_ENTRY;
   }
@@ -187,7 +187,7 @@ void substring_hash_table_no_realloc_insert(struct SubstringHashTable* table, Su
     struct SubstringHashTableEntry* entry = &table->table[index];  
 
     
-    switch (check_entry_insert(entry, str, hash)) {
+    switch (check_entry(entry, str, hash)) {
       case INITIALIZE_THIS_ENTRY:
         entry->hash = hash;
         entry->str = str;
@@ -237,14 +237,21 @@ struct SubstringHashTable *insert_into_substring_hash_table(struct SubstringHash
 struct SimpleSizeTArray substring_hash_table_get_entry(struct SubstringHashTable* table, Substring str) {
   const uint32_t hash = fnv1a_hash(str);
 
-  size_t index = hash & (table->capacity - 1);
+  const size_t canonical_index = hash & (table->capacity - 1);
+  size_t index = canonical_index;
 
   struct SimpleSizeTArray output;
 
   while (true) {
     struct SubstringHashTableEntry* entry = &table->table[index];  
 
-    switch (check_entry_insert(entry, str, hash)) {
+    switch (check_entry(entry, str, hash)) {
+      case PROBE_NEXT_ENTRY:
+        index = (index + 1) & (table->capacity - 1);
+        if (index != canonical_index) {
+          break; // From the switch, not the loop, actually restarts the loop
+        }
+        // Intentional fallthrough
       case INITIALIZE_THIS_ENTRY:
         output.array = NULL;
         output.size = 0;
@@ -253,14 +260,52 @@ struct SimpleSizeTArray substring_hash_table_get_entry(struct SubstringHashTable
         output.array = entry->line_numbers;
         output.size = entry->line_numbers_len;
         return output;
-      case PROBE_NEXT_ENTRY:
-        index = (index + 1) & (table->capacity - 1);
-        break; // From the switch, not the loop
       // No default case because it is not possible
     }
   }
 }
 
 
+
+
+struct HashTablePerformanceHeuristics* get_substring_hash_table_performance_heuristics(struct SubstringHashTable *table) {
+  struct HashTablePerformanceHeuristics *output = malloc(sizeof(struct HashTablePerformanceHeuristics));
+  output->capacity = table->capacity;
+  output->load = table->load;
+  output->clusters = 0;
+  output->entries_not_at_home = 0;
+  output->max_cluster_size = 0;
+
+  bool currently_in_cluster = false;
+  size_t current_cluster_size = 0;
+  for (size_t i = 0; i < table->capacity; ++i) {
+    if (currently_in_cluster && table->table[i].line_numbers == NULL) {
+      currently_in_cluster = false;
+      if (current_cluster_size > output->max_cluster_size) {
+        output = realloc(output, sizeof(struct HashTablePerformanceHeuristics) + current_cluster_size * sizeof(size_t));
+        memset(output->cluster_size_populations + output->max_cluster_size, 0, sizeof(size_t) * (current_cluster_size - output->max_cluster_size));
+        output->max_cluster_size = current_cluster_size;
+      }
+      output->cluster_size_populations[current_cluster_size - 1]++;
+      current_cluster_size = 0;
+    }
+    else if (currently_in_cluster) {
+      current_cluster_size++;
+      output->entries_not_at_home++;
+    }
+    else if (table->table[i].line_numbers != NULL) {
+      output->clusters++;
+      current_cluster_size++;
+      currently_in_cluster = true;
+    }
+  }
+  if (currently_in_cluster) {
+    output->max_cluster_size = current_cluster_size > output->max_cluster_size ? current_cluster_size : output->max_cluster_size;
+  }
+
+
+
+  return output;
+}
 
 

@@ -122,8 +122,34 @@ struct SimpleSizeTArray {
 };
 
 /**
-  * \brief Returns an array containing all the line numbers `str` was recorded to appear at in the given table
+  * \brief Returns an array containing all the line numbers `str` was recorded to appear at in the given table (in no particular order)
   */
 struct SimpleSizeTArray substring_hash_table_get_entry(struct SubstringHashTable* table, Substring str);
+
+
+
+// TODO!! Could someone write a function to pretty-print HashTablePerformanceHeuristics? - Lily <3
+
+/**
+  * \brief Contains data about a hash table which the performance of that hash table in insertion
+  * or lookup operations is sensitive to (but not actual measured performance metrics).
+  */
+struct HashTablePerformanceHeuristics {
+  size_t capacity;
+  size_t load;
+
+  /// Stores the total number of entries which are not at their canonical locations
+  size_t entries_not_at_home;
+  /// Stores the number of "clusters" of entries (runs of entries with no empty entries between them)
+  size_t clusters;
+  /// Stores the size of the largest cluster (If this is 1, things are good! :D)
+  size_t max_cluster_size;
+  /// `cluster_size_populations[i]` is the number of clusters of size i + 1 in the hash table.
+  size_t cluster_size_populations[];
+ 
+};
+
+struct HashTablePerformanceHeuristics *get_substring_hash_table_performance_heuristics(struct SubstringHashTable* table);
+
 
 
