@@ -41,9 +41,9 @@ bool equal(Substring, Substring);
   * \brief Just an array of substrings with tracking for the size.
   */
 struct SubstringArray {
-  size_t len;
-  size_t capacity;
-  Substring array[];
+	size_t len;			//how many elements are currently in array
+	size_t capacity;	//max number of elements array can hold
+	Substring array[];
 };
 
 
