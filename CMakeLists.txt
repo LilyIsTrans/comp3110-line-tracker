@@ -7,9 +7,28 @@ SET(CMAKE_C_EXTENSIONS OFF)
 SET(CMAKE_C_STANDARD 17)
 SET(CMAKE_C_STANDARD_REQUIRED ON)
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# SET(CMAKE_C_FLAGS "")
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ggdb")
 endif()
+
+
+# Source - https://stackoverflow.com/q
+# Posted by Levi Morrison
+# Retrieved 2025-11-26, License - CC BY-SA 3.0
+
+include(CheckCCompilerFlag)
+CHECK_C_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
+if(COMPILER_SUPPORTS_MARCH_NATIVE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
+endif()
+include(CheckCCompilerFlag)
+CHECK_C_COMPILER_FLAG("-mtune=native" COMPILER_SUPPORTS_MTUNE_NATIVE)
+if(COMPILER_SUPPORTS_MTUNE_NATIVE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
+endif()
+
+
   
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 

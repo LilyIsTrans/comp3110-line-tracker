@@ -37,7 +37,7 @@ int main(int argc, const char **argv) {
   struct SubstringHashTable* new_lines_table = new_substring_hash_table(hash_table_size);
 
   for (size_t i = 0; i < new_lines->len; ++i) {
-    insert_into_substring_hash_table(new_lines_table, new_lines->array[i], i);
+    new_lines_table = insert_into_substring_hash_table(new_lines_table, new_lines->array[i], i);
   }
 
   for (size_t i = 0; i < prior_lines->len; ++i) {
