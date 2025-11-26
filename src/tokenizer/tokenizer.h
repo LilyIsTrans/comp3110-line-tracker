@@ -4,3 +4,5 @@
 #include <string.h>
 #include <stdint.h>
 
+struct SubstringArray* tokenize_lines(struct SubstringArray* lines, char delimiter);
+struct SubstringArray* tokenize(Substring haystack, char delimiter);

@@ -54,6 +54,7 @@ struct SubstringArray {
   */
 struct SubstringArray *new_substring_array(const size_t capacity);
 
+struct SubstringArray* append_to_substring_array(struct SubstringArray* array, const Substring str);
 /**
   * \brief Returns an array of substrings from the haystack holding each line in the haystack.
   * Does not include trailing `'\n'` characters, but other whitespace is treated as

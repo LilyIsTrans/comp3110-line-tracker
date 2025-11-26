@@ -13,7 +13,6 @@ endif()
   
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 
-add_library(tokenizer_test src/tokenizer/tokenizer.c src/tokenizer/tokenizer.h)
 add_library(load_file OBJECT src/load-file/load.c src/load-file/load.h)
 
 add_executable(loaded_file_length_test ${CMAKE_SOURCE_DIR}/src/tests/unit/loaded-file-length.c $<TARGET_OBJECTS:load_file>)
@@ -22,3 +21,6 @@ add_test(NAME LoadedFileLength COMMAND loaded_file_length_test ${CMAKE_SOURCE_DI
 
 add_library(string_slice OBJECT src/string-slice/string-slice.c src/string-slice/string-slice.h)
 add_executable(file_line_test ${CMAKE_SOURCE_DIR}/src/tests/unit/line-numbers.c $<TARGET_OBJECTS:string_slice>)
+
+
+add_library(tokenizer_test src/tokenizer/tokenizer.c src/tokenizer/tokenizer.h $<TARGET_OBJECTS:string_slice>)
