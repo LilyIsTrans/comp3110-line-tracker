@@ -39,7 +39,9 @@ struct SubstringArray *new_substring_array(const size_t capacity) {
   output->capacity = capacity;
 
   //initialize substring array to 0 to prevent garbage values
-  memset(output->array, 0, capacity);
+  if (capacity != 0) {
+    memset(output->array, 0, capacity);
+  }
   return output;
 }
 
@@ -55,6 +57,7 @@ struct SubstringArray* append_to_substring_array(struct SubstringArray* array, c
       exit(EXIT_FAILURE);
     }
     array = new_array;
+    array->capacity *= 2;
   }
 
   array->array[array->len] = str;   //append new substring
@@ -64,7 +67,7 @@ struct SubstringArray* append_to_substring_array(struct SubstringArray* array, c
 
 //splits substring (haystack) into lines based on '\n' characters
 struct SubstringArray* lines(Substring haystack) {
-	struct SubstringArray* output = new_substring_array(0);  //new substring array to hold lines
+	struct SubstringArray* output = new_substring_array(1);  //new substring array to hold lines
   Substring last_line_so_far = haystack;
   last_line_so_far.end = last_line_so_far.start;
 
