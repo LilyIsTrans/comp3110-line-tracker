@@ -1,9 +1,10 @@
-#include "../../src/string-slice/string-slice.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../../src/string-slice/string-slice.h"
+#include "tokenizer.h"
 
 //split a SubstringArray of lines into tokens based on delimiter
 struct SubstringArray* tokenize_lines(struct SubstringArray* lines, char delimiter) {
