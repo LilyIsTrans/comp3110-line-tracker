@@ -190,7 +190,7 @@ enum LinearProbingAction check_entry(struct SubstringHashTableEntry *entry, Subs
 }
 
 //insert substring into hash table without reallocating (assume sufficient memory is available)
-void substring_hash_table_no_realloc_insert(struct SubstringHashTable* table, Substring str, size_t line_number_len, size_t line_numbers[line_number_len]) {
+void substring_hash_table_no_realloc_insert(struct SubstringHashTable* table, Substring str, size_t line_number_len, size_t *line_numbers) {
   const uint32_t hash = fnv1a_hash(str);
 
   //if table is over half full, print warning
