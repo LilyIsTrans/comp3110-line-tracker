@@ -57,6 +57,7 @@ struct SubstringArray* append_to_substring_array(struct SubstringArray* array, c
       exit(EXIT_FAILURE);
     }
     array = new_array;
+    array->capacity *= 2;
   }
 
   array->array[array->len] = str;   //append new substring
