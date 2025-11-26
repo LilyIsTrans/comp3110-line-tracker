@@ -5,8 +5,6 @@
 #include <string.h>
 
 
-
-
 #if (defined(__linux__) || defined(__linux)) && !defined(FORCE_PORTABLE_FALLBACK)
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -92,11 +90,14 @@ void unload_file(struct LoadedFile *file) {
 
 
 struct LoadedFile {
-  const char* data;
-  size_t length;
+  const char* data;    //hold contents of file
+  size_t length;       //size of file (bytes)
 };
+
 struct LoadedFile* load_from_filename(const char* const filename) {
   FILE* file = fopen(filename, "rb");
+
+  //ERROR HANDLING
   if (file == NULL) {
     fprintf(stderr, "Failed to open file '%s', reason: '%s'.\n", filename, strerror(errno));
     exit(EXIT_FAILURE);
@@ -110,31 +111,43 @@ struct LoadedFile* load_from_filename(const char* const filename) {
     fprintf(stderr, "Failed to read cursor position for file '%s'. Either your libc is broken or your computer is haunted. Officially, the error was '%s'. The stream error indicator was %d (0 indicates no error).\n", filename, strerror(errno), ferror(file));
     exit(EXIT_FAILURE);
   }
+
+  //file size in bytes (saved for later)
   size_t filesize = filesize_temp;
 
+  //allocate memory to hold file contents
   char* data = malloc(filesize);
+
+  //ERROR HANDLING
   if (data == NULL) {
     fprintf(stderr, "Failed to allocate %zu bytes to store the data of file '%s'. Reason: %s.\n", filesize, filename, strerror(errno));
     exit(EXIT_FAILURE);
   }
 
+  //reset file cursor to beginning of file
   if (fseek(file, 0, SEEK_SET)) {
     fprintf(stderr, "Failed to seek to start of file '%s'. Either your libc is broken or your computer is haunted. Officially, the error was '%s'. The stream error indicator was %d (0 indicates no error).\n", filename, strerror(errno), ferror(file));
     exit(EXIT_FAILURE);
   }
 
+  //total num of bytes read so far
   size_t bytes_read = 0;
 
   while (true) {
+      //read from file into data buffer
       size_t this_read = fread(data + bytes_read, 1, filesize - bytes_read, file);
       fprintf(stderr, "Read %zu bytes from file '%s'\n.", this_read, filename);
+      
+      //ERROR HANDLING
       if (ferror(file)) {
         fprintf(stderr, "Failed to read from file '%s' at position %zu with %zu bytes to go because '%s'. The stream error indicator was %d (0 indicates no error).\n", filename, bytes_read, filesize - bytes_read, strerror(errno), ferror(file));
         exit(EXIT_FAILURE);
       }
+      //check if entire file has been read
       else if (bytes_read + this_read == filesize) {
         break;
       }
+      //ERROR HANDLING
       else if (feof(file)) {
         fprintf(stderr, "Mysterious end-of-file on file '%s' at %zu bytes read despite file having been previously measured %zu bytes long. Please do not use this program with files actively being modified.\n", filename, bytes_read, filesize);
         exit(EXIT_FAILURE);
@@ -146,28 +159,30 @@ struct LoadedFile* load_from_filename(const char* const filename) {
           exit(EXIT_FAILURE);
         }
       }
-    
   }
 
   fclose(file);
 
-  struct LoadedFile output_data = {data, filesize};
-  struct LoadedFile *output = malloc(sizeof(struct LoadedFile));
-  *output = output_data;
+  struct LoadedFile output_data = { data, filesize }; 		        //initialize struct
+  struct LoadedFile *output = malloc(sizeof(struct LoadedFile));    //allocate memory for struct
+  *output = output_data;                                            //copy data into allocated struct
   return output;
   
 }
 
 void unload_file(struct LoadedFile *file) {
-  free((void*)file->data);
-  free(file);
+  free((void*)file->data);   //free memory allocated for file data
+  free(file);                //free memory allocated for struct
 }
 
 #endif
 
+//return pointer to file data
 const char* get_data_ptr(struct LoadedFile* file)  {
   return file->data;
 }
+
+//return size of file (bytes)
 size_t get_size(struct LoadedFile* file)  {
   return file->length;
 }
