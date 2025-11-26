@@ -49,6 +49,6 @@ int main(int argc, const char **argv) {
         printf(", ");
       }
     }
-    printf("in '%s'\n", argv[2]);
+    printf(" in '%s'\n", argv[2]);
   }
 }
