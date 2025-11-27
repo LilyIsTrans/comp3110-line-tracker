@@ -44,7 +44,8 @@ int printing_thread(void *output_buffer_) {
 
   while (true) {
     cnd_wait(&output_buffer->wait_for_data, &output_buffer->wait_for_data_mtx);
-    if (atomic_load_explicit(&output_buffer->exit_thread, memory_order_acquire)) {
+    if (atomic_load_explicit(&output_buffer->exit_thread,
+                             memory_order_acquire)) {
       thrd_exit(0);
     }
     fputs(output_buffer->buf, stdout);
@@ -53,16 +54,15 @@ int printing_thread(void *output_buffer_) {
   }
 }
 
-void async_print(int *current_buffer, const char *format, ...) {
-  va_list var_args, backup_args;
-  va_start(var_args, format);
-  va_copy(backup_args, var_args);
+void async_print(int *current_buffer, const char *format, size_t a,
+                 const char *const b) {
   mtx_lock(&out_bufs[*current_buffer].wait_for_data_mtx);
   size_t available_space =
       (out_bufs[*current_buffer].buf + sizeof(out_bufs[*current_buffer].buf)) -
       out_bufs[*current_buffer].write_cursor;
-  size_t printed = vsnprintf(out_bufs[*current_buffer].write_cursor,
-                             available_space, format, var_args);
+  size_t printed;
+  printed = snprintf(out_bufs[*current_buffer].write_cursor, available_space,
+                     format, a, b);
   if (printed >= available_space) {
     *out_bufs[*current_buffer].write_cursor = '\0';
     cnd_signal(&out_bufs[*current_buffer].wait_for_data);
@@ -72,16 +72,14 @@ void async_print(int *current_buffer, const char *format, ...) {
     size_t available_space = (out_bufs[*current_buffer].buf +
                               sizeof(out_bufs[*current_buffer].buf)) -
                              out_bufs[*current_buffer].write_cursor;
-    printed = vsnprintf(out_bufs[*current_buffer].write_cursor, available_space,
-                        format, backup_args);
+    printed = snprintf(out_bufs[*current_buffer].write_cursor, available_space,
+                       format, a, b);
     mtx_unlock(&out_bufs[*current_buffer].wait_for_data_mtx);
 
   } else {
     out_bufs[*current_buffer].write_cursor += printed;
     mtx_unlock(&out_bufs[*current_buffer].wait_for_data_mtx);
   }
-  va_end(var_args);
-  va_end(backup_args);
 }
 
 int main(int argc, const char **argv) {
@@ -123,7 +121,7 @@ int main(int argc, const char **argv) {
 
   for (size_t i = 0; i < new_lines->len; ++i) {
     if (new_lines->array[i].end != new_lines->array[i].start) {
-      size_t* I = malloc(sizeof(i));
+      size_t *I = malloc(sizeof(i));
       *I = i;
       new_lines_table = insert_into_substring_hash_table(
           new_lines_table, new_lines->array[i], I);
@@ -173,31 +171,30 @@ int main(int argc, const char **argv) {
   //   async_print(&current_buffer, " in '%s'\n", argv[2]);
   // }
 
-  struct SimpleSizeTArray *duplicates_of = malloc(prior_lines->len * sizeof(struct SimpleSizeTArray));
+  struct SimpleSizeTArray *duplicates_of =
+      malloc(prior_lines->len * sizeof(struct SimpleSizeTArray));
   for (size_t i = 0; i < prior_lines->len; ++i) {
     duplicates_of[i] =
         substring_hash_table_get_entry(new_lines_table, prior_lines->array[i]);
   }
 
-
   for (size_t i = 0; i < prior_lines->len; ++i) {
     if (duplicates_of[i].size != 0) {
-      async_print(&current_buffer, "Line %zu in '%s' was found on lines: ", i + 1,
-                  argv[1]);
+      async_print(&current_buffer,
+                  "Line %zu in '%s' was found on lines: ", i + 1, argv[1]);
       for (size_t j = 0; j + 1 < duplicates_of[i].size; ++j) {
-        async_print(&current_buffer, "%zu, ", duplicates_of[i].array[j] + 1);
+        async_print(&current_buffer, "%zu, ", duplicates_of[i].array[j] + 1, NULL);
       }
       async_print(&current_buffer, "%zu in '%s'\n",
                   duplicates_of[i].array[duplicates_of[i].size - 1], argv[2]);
-      
     }
   }
   free(duplicates_of);
+  free_substring_hash_table(new_lines_table);
   atomic_store_explicit(&out_bufs[0].exit_thread, true, memory_order_release);
   atomic_store_explicit(&out_bufs[1].exit_thread, true, memory_order_release);
   cnd_signal(&out_bufs[0].wait_for_data);
   cnd_signal(&out_bufs[1].wait_for_data);
-  free_substring_hash_table(new_lines_table);
   thrd_join(output_threads[0], NULL);
   thrd_join(output_threads[1], NULL);
   cnd_destroy(&out_bufs[0].wait_for_data);
@@ -210,5 +207,4 @@ int main(int argc, const char **argv) {
 
   free(prior_lines);
   free(new_lines);
-
 }
