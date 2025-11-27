@@ -111,7 +111,7 @@ struct SubstringHashTable *new_substring_hash_table(size_t capacity);
 /**
   * \brief Inserts `str` into `table`, reallocating the table if necessary.
   */
-struct SubstringHashTable *insert_into_substring_hash_table(struct SubstringHashTable* table, Substring str, size_t line_number);
+struct SubstringHashTable *insert_into_substring_hash_table(struct SubstringHashTable* table, Substring str, size_t *line_number);
 
 
 /**
@@ -152,5 +152,6 @@ struct HashTablePerformanceHeuristics {
 
 struct HashTablePerformanceHeuristics *get_substring_hash_table_performance_heuristics(struct SubstringHashTable* table);
 
+void free_substring_hash_table(struct SubstringHashTable* table);
 
 

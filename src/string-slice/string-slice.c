@@ -97,6 +97,21 @@ uint32_t fnv1a_hash(Substring str) {
   return hash;
   
 }
+//calculates FNV-1 hash for substrings
+uint32_t fnv1_hash(Substring str) {
+  const uint32_t FNV_OFFSET_BASIS = 0x811c9dc5; // Pulled from https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV_hash_parameters
+  const uint32_t FNV_PRIME = 0x01000193; // Pulled from https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV_hash_parameters
+
+  uint32_t hash = FNV_OFFSET_BASIS;
+
+  for (; str.start < str.end; str.start++) {
+    hash *= FNV_PRIME;
+    hash ^= (uint32_t)(*str.start);
+  }
+
+  return hash;
+  
+}
 
 //allocate memory for HashArray struct
 struct HashArray *new_hash_array(size_t capacity) {
@@ -166,8 +181,15 @@ struct SubstringHashTable *new_substring_hash_table(size_t capacity) {
   
 }
 
-//define actions for linear probing (resolving collisions in hash table)
-enum LinearProbingAction {
+void free_substring_hash_table(struct SubstringHashTable* table) {
+  for (size_t i = 0; i < table->capacity; ++i) {
+    free(table->table[i].line_numbers);
+  }
+  free(table);
+}
+
+//define actions for probing (resolving collisions in hash table)
+enum ProbingAction {
   INITIALIZE_THIS_ENTRY,  //current entry is empty, initialize it
   APPEND_TO_THIS_ENTRY,   //current entry matches, append line number
   PROBE_NEXT_ENTRY,       //current entry occupied but does not match, probe next entry
@@ -177,7 +199,7 @@ enum LinearProbingAction {
 /// `hash` should be the result of calling `fnv1a_hash` on `str`.
 /// Tells you what to do next in the linear probing process to insert
 /// the substring `str` into this entry.
-enum LinearProbingAction check_entry(struct SubstringHashTableEntry *entry, Substring str, uint32_t hash) {
+enum ProbingAction check_entry(struct SubstringHashTableEntry *entry, Substring str, uint32_t hash) {
     //initialize entry if empty
     if (entry->line_numbers == NULL) {
         return INITIALIZE_THIS_ENTRY;
@@ -193,6 +215,7 @@ enum LinearProbingAction check_entry(struct SubstringHashTableEntry *entry, Subs
 }
 
 //insert substring into hash table without reallocating (assume sufficient memory is available)
+// Takes ownership of `line_numbers`
 void substring_hash_table_no_realloc_insert(struct SubstringHashTable* table, Substring str, size_t line_number_len, size_t *line_numbers) {
   const uint32_t hash = fnv1a_hash(str);
 
@@ -202,6 +225,7 @@ void substring_hash_table_no_realloc_insert(struct SubstringHashTable* table, Su
   }
   
   size_t index = hash & (table->capacity - 1);
+  const uint32_t step_size = (fnv1_hash(str) & (table->capacity - 1)) | 1;
 
   //linear probing to find appropriate entry
   while (true) {
@@ -213,19 +237,19 @@ void substring_hash_table_no_realloc_insert(struct SubstringHashTable* table, Su
         entry->hash = hash;
         entry->str = str;
         entry->line_numbers_len = line_number_len;
-        entry->line_numbers = malloc(sizeof(size_t) * entry->line_numbers_len);
-        memcpy(entry->line_numbers, line_numbers, line_number_len * sizeof(size_t));
+        entry->line_numbers = line_numbers;
         table->load++;
         return;
 
       case APPEND_TO_THIS_ENTRY:
         entry->line_numbers = realloc(entry->line_numbers, sizeof(size_t) * (entry->line_numbers_len + line_number_len)); // Assume sufficient memory
         memcpy(entry->line_numbers + entry->line_numbers_len, line_numbers, sizeof(size_t) * line_number_len);
+        free(line_numbers);
         entry->line_numbers_len += line_number_len;
         return;
 
       case PROBE_NEXT_ENTRY:
-        index = (index + 1) & (table->capacity - 1);
+        index = (index + step_size) & (table->capacity - 1);
         break; // From the switch, not the loop
       // No default case because it is not possible
     }
@@ -244,17 +268,20 @@ struct SubstringHashTable *reallocate_substring_hash_table(struct SubstringHashT
     }
   }
 
-  free(old_table);
+  free(old_table); // `substring_hash_table_no_realloc_insert` takes ownership of all the internal pointers, so this is the correct
+  // action, not the more complicated hash table free (which would actually be undefined behaviour).
   return new_table;
 }
 
 //reallocate hash table if necessary (more than half full)
-struct SubstringHashTable *insert_into_substring_hash_table(struct SubstringHashTable* table, Substring str, size_t line_number) {
-  if (table->load >= table->capacity / 2) {
+struct SubstringHashTable *insert_into_substring_hash_table(struct SubstringHashTable* table, Substring str, size_t *line_number) {
+  if (table->load >= table->capacity / 4) {
     table = reallocate_substring_hash_table(table);
   }
 
-  substring_hash_table_no_realloc_insert(table, str, 1, &line_number);
+  
+
+  substring_hash_table_no_realloc_insert(table, str, 1, line_number);
 
   return table;
   
@@ -265,6 +292,7 @@ struct SimpleSizeTArray substring_hash_table_get_entry(struct SubstringHashTable
   const uint32_t hash = fnv1a_hash(str);
 
   const size_t canonical_index = hash & (table->capacity - 1);
+  const uint32_t step_size = (fnv1_hash(str) & (table->capacity - 1)) | 1;
   size_t index = canonical_index;
 
   struct SimpleSizeTArray output;
@@ -274,7 +302,7 @@ struct SimpleSizeTArray substring_hash_table_get_entry(struct SubstringHashTable
 
     switch (check_entry(entry, str, hash)) {
       case PROBE_NEXT_ENTRY:
-        index = (index + 1) & (table->capacity - 1);
+        index = (index + step_size) & (table->capacity - 1);
         if (index != canonical_index) {
           break; // From the switch, not the loop, actually restarts the loop
         }
