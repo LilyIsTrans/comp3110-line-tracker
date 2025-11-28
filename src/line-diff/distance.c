@@ -4,10 +4,9 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
 int levenshteinDistance(const char* str1,
-                            const char* str2, 
-                            const unsigned int len1,
-                            const unsigned int len2)
-{
+                        const char* str2, 
+                        const unsigned int len1,
+                        const unsigned int len2) {
 
     if (len2 < len1) {
         return levenshteinDistance(str2, str1, len2, len1);
@@ -15,7 +14,6 @@ int levenshteinDistance(const char* str1,
 
     int * prevRow;
     int * currRow;
-    
     currRow = (int *) malloc((len1 + 1) * sizeof(int));
     prevRow = (int *) malloc((len1 + 1) * sizeof(int));
 
