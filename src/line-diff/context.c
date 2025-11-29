@@ -1,3 +1,4 @@
+#include "context.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +9,7 @@
 #define MAX_TOKEN_LEN 50
 #define MAX_STRINGS 100
 
+/*
 typedef struct {
     char tokens[MAX_TOKENS][MAX_TOKEN_LEN];
     int count;
@@ -18,6 +20,12 @@ typedef struct {
     int count_a;
     int count_b;
 } TokenCount;
+
+typedef struct {
+    char* candidate;
+    double similarity;
+} comparisonResult;
+*/
 
 TokenList extract_tokens(const char *text) {
     TokenList list = {.count = 0};
@@ -100,11 +108,6 @@ double cosine_similarity(const char *text_a, const char *text_b) {
     if (mag_a == 0.0 || mag_b == 0.0) return 0.0;
     return dot_product / (sqrt(mag_a) * sqrt(mag_b));
 }
-
-typedef struct {
-    char* candidate;
-    double similarity;
-} comparisonResult;
 
 comparisonResult* compare_all_pairs(char* query, char** strings, int num_strings) {
     comparisonResult* results = (comparisonResult *) malloc(num_strings * sizeof(comparisonResult));
