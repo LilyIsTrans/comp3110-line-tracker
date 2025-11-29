@@ -19,14 +19,6 @@ typedef struct {
     int count_b;
 } TokenCount;
 
-// Define a proper struct for results
-typedef struct {
-    int index;
-    double similarity;
-    const char *text;
-} SimilarityResult;
-
-// Efficient token extraction
 TokenList extract_tokens(const char *text) {
     TokenList list = {.count = 0};
     int len = strlen(text);
@@ -55,18 +47,15 @@ TokenList extract_tokens(const char *text) {
     return list;
 }
 
-// Most efficient for short strings: array-based direct comparison
-double array_direct_comparison(const char *text_a, const char *text_b) {
+double cosine_similarity(const char *text_a, const char *text_b) {
     TokenList tokens_a = extract_tokens(text_a);
     TokenList tokens_b = extract_tokens(text_b);
     
     if (tokens_a.count == 0 || tokens_b.count == 0) return 0.0;
     
-    // Use fixed-size array (much faster for small token counts)
     TokenCount token_counts[MAX_TOKENS * 2];
     int token_count = 0;
     
-    // Count tokens from first string
     for (int i = 0; i < tokens_a.count; i++) {
         int found = 0;
         for (int j = 0; j < token_count; j++) {
@@ -84,7 +73,6 @@ double array_direct_comparison(const char *text_a, const char *text_b) {
         }
     }
     
-    // Count tokens from second string
     for (int i = 0; i < tokens_b.count; i++) {
         int found = 0;
         for (int j = 0; j < token_count; j++) {
@@ -102,7 +90,6 @@ double array_direct_comparison(const char *text_a, const char *text_b) {
         }
     }
     
-    // Calculate cosine similarity
     double dot_product = 0.0, mag_a = 0.0, mag_b = 0.0;
     for (int i = 0; i < token_count; i++) {
         dot_product += token_counts[i].count_a * token_counts[i].count_b;
@@ -114,100 +101,22 @@ double array_direct_comparison(const char *text_a, const char *text_b) {
     return dot_product / (sqrt(mag_a) * sqrt(mag_b));
 }
 
-// Batch comparison - find most similar strings to a query
-void find_similar_strings(const char *query, char **candidates, int num_candidates, int top_k) {
-    printf("Query: \"%s\"\n", query);
-    printf("Top %d most similar candidates:\n", top_k);
-    
-    // Store similarities
-    SimilarityResult results[MAX_STRINGS];
-    
-    // Calculate all similarities
-    for (int i = 0; i < num_candidates; i++) {
-        results[i].index = i;
-        results[i].similarity = array_direct_comparison(query, candidates[i]);
-        results[i].text = candidates[i];
-    }
-    
-    // Sort by similarity (simple bubble sort - fine for small lists)
-    for (int i = 0; i < num_candidates - 1; i++) {
-        for (int j = 0; j < num_candidates - i - 1; j++) {
-            if (results[j].similarity < results[j + 1].similarity) {
-                SimilarityResult temp = results[j];
-                results[j] = results[j + 1];
-                results[j + 1] = temp;
-            }
-        }
-    }
-    
-    // Display top results
-    for (int i = 0; i < top_k && i < num_candidates; i++) {
-        printf("%d. [%.4f] %s\n", i + 1, results[i].similarity, results[i].text);
-    }
-    printf("\n");
-}
+typedef struct {
+    char* candidate;
+    double similarity;
+} comparisonResult;
 
-// Compare all pairs efficiently
-void compare_all_pairs(char **strings, int num_strings) {
-    printf("=== All Pairwise Comparisons ===\n");
-    printf("     ");
-    for (int i = 0; i < num_strings; i++) printf("S%-2d    ", i + 1);
-    printf("\n");
-    
-    for (int i = 0; i < num_strings; i++) {
-        printf("S%-2d  ", i + 1);
-        for (int j = 0; j < num_strings; j++) {
-            double similarity = array_direct_comparison(strings[i], strings[j]);
-            printf("%.3f  ", similarity);
-        }
-        printf("\n");
+comparisonResult* compare_all_pairs(char* query, char** strings, int num_strings) {
+    comparisonResult* results = (comparisonResult *) malloc(num_strings * sizeof(comparisonResult));
+    for (int j = 0; j < num_strings; j++) {
+        double similarity = cosine_similarity(query, strings[j]);
+        results[j].candidate = strings[j];
+        results[j].similarity = similarity;
     }
-}
-
-// Simple version without sorting - just find top matches
-void find_similar_strings_simple(const char *query, char **candidates, int num_candidates, int top_k) {
-    printf("Query: \"%s\"\n", query);
-    printf("Top %d most similar candidates:\n", top_k);
-    
-    double similarities[MAX_STRINGS];
-    
-    // Calculate all similarities
-    for (int i = 0; i < num_candidates; i++) {
-        similarities[i] = array_direct_comparison(query, candidates[i]);
-    }
-    
-    // Find top k without full sorting
-    for (int k = 0; k < top_k && k < num_candidates; k++) {
-        int best_index = -1;
-        double best_similarity = -1.0;
-        
-        for (int i = 0; i < num_candidates; i++) {
-            // Skip already selected candidates
-            int already_selected = 0;
-            for (int j = 0; j < k; j++) {
-                // Simple check: if this candidate was in top results before
-                if (similarities[i] == -2.0) { // -2.0 means already selected
-                    already_selected = 1;
-                    break;
-                }
-            }
-            
-            if (!already_selected && similarities[i] > best_similarity) {
-                best_similarity = similarities[i];
-                best_index = i;
-            }
-        }
-        
-        if (best_index != -1) {
-            printf("%d. [%.4f] %s\n", k + 1, best_similarity, candidates[best_index]);
-            similarities[best_index] = -2.0; // Mark as selected
-        }
-    }
-    printf("\n");
+    return results;
 }
 
 int main() {
-    // Your candidate strings
     char *candidates[] = {
         "user-name = first_name + last_name",
         "user-name = firstname + lastname", 
@@ -222,32 +131,12 @@ int main() {
     };
     int num_candidates = sizeof(candidates) / sizeof(candidates[0]);
     
-    // Example queries
-    char *queries[] = {
-        "user-name = first_name + last_name",
-        "user_profile = get_user_data(user_id)",
-        "customer_profile = first_name + last_name"
-    };
-    int num_queries = sizeof(queries) / sizeof(queries[0]);
+    char *query = "user-name = first_name + last_name";
     
-    printf("=== Finding Similar Strings ===\n\n");
-    
-    // Test each query with simple version (no struct issues)
-    for (int i = 0; i < num_queries; i++) {
-        find_similar_strings_simple(queries[i], candidates, num_candidates, 3);
+    comparisonResult* results;
+    results = compare_all_pairs(query, candidates, num_candidates);
+    for (int i=0; i<num_candidates; i++) {
+        printf("%s: %.3f\n", results[i].candidate, results[i].similarity);
     }
-    
-    // Show all pairwise comparisons
-    compare_all_pairs(candidates, num_candidates);
-    
-    // Test individual comparisons
-    printf("\n=== Key Comparisons ===\n");
-    printf("'user-name = first_name + last_name' vs 'user-name = firstname + lastname': %.4f\n",
-           array_direct_comparison(candidates[0], candidates[1]));
-    printf("'user-name = first_name + last_name' vs 'user_profile = get_profile_data(user_id)': %.4f\n",
-           array_direct_comparison(candidates[0], candidates[4]));
-    printf("'user-name = first_name + last_name' vs 'customer_name = first_name + last_name': %.4f\n",
-           array_direct_comparison(candidates[0], candidates[8]));
-    
     return 0;
 }
