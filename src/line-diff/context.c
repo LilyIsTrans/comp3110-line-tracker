@@ -119,6 +119,7 @@ comparisonResult* compare_all_pairs(char* query, char** strings, int num_strings
     return results;
 }
 
+/*
 int main() {
     char *candidates[] = {
         "user-name = first_name + last_name",
@@ -143,3 +144,4 @@ int main() {
     }
     return 0;
 }
+    */

@@ -1,15 +1,18 @@
 #include "distance.h"
+#include "context.h"
 #include <stdio.h>
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
+
 int levenshteinDistance(const char* str1,
-                        const char* str2, 
-                        const unsigned int len1,
-                        const unsigned int len2) {
+                        const char* str2) {
+
+    int len1 = strlen(str1);
+    int len2 = strlen(str2);
 
     if (len2 < len1) {
-        return levenshteinDistance(str2, str1, len2, len1);
+        return levenshteinDistance(str2, str1);
     }
 
     int * prevRow;
@@ -43,15 +46,17 @@ int levenshteinDistance(const char* str1,
     return res;
 }
 
-void closestLine(char* str1, char* strs[], int strscount, char** best, int* bestDiff) {
+void closestLine(Line str1, Line strs[], int strscount, Line* best, double* bestDiff) {
     *bestDiff = -1;
     for(int i=0; i<strscount; i++) {
-        int diff = levenshteinDistance(str1, strs[i], strlen(str1), strlen(strs[i]));
-        if (*bestDiff ==-1) {
-            *bestDiff = diff;
-            *best = strs[i];
-        }
-        if (diff < *bestDiff) {
+        double dist = (double) levenshteinDistance(str1.line, strs[i].line);
+        dist /= strlen(str1.line);
+        dist = 1-dist;
+        double context = (cosine_similarity(str1.prevContext, strs[i].prevContext) + cosine_similarity(str1.postContext, strs[i].postContext)) / 2;
+        
+        double diff = 0.6 * (double)dist + 0.4 * context;
+        
+        if (diff > *bestDiff) {
             *bestDiff = diff;
             *best = strs[i];
         }
@@ -59,19 +64,19 @@ void closestLine(char* str1, char* strs[], int strscount, char** best, int* best
 }
 
 int main(int argc, const char **argv) {
-    char* str1 = "abcdef";
-    char* strs[] =  {
-        "abcde",
-        "bcd",
-        "test",
-        "tictac",
+    Line str1 = {"a b c", "abcdef", "d e f"};
+    Line strs[] =  {
+        {"a b c","abcde","d e f"},
+        {"a x c","bcd","d x f"},
+        {"a x x","test","d x x"},
+        {"x x x","tictac","x x x"},
     };
-    int d;
-    char* best;
+    double d;
+    Line best;
 
     closestLine(str1, strs, sizeof(strs)/sizeof(strs[0]), &best, &d);
 
-    printf("%s, %s: %d", str1, best, d);
+    printf("%s, %s: %.3f\n", str1.line, best.line, d);
     
-        return 0;
+    return 0;
 }
