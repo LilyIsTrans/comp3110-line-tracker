@@ -41,7 +41,7 @@ add_test(NAME LoadedFileLength COMMAND loaded_file_length_test ${CMAKE_SOURCE_DI
 add_library(string_slice OBJECT src/string-slice/string-slice.c src/string-slice/string-slice.h)
 add_executable(file_line_test ${CMAKE_SOURCE_DIR}/src/tests/unit/line-numbers.c $<TARGET_OBJECTS:string_slice>)
 
-
-add_executable(proof-of-concept  ${CMAKE_SOURCE_DIR}/src/proof-of-concept/proof-of-concept.c $<TARGET_OBJECTS:load_file> $<TARGET_OBJECTS:string_slice>)
+add_library(xml_output OBJECT src/xml-output/xml-output.c src/xml-output/xml-output.h)
+add_executable(proof-of-concept  ${CMAKE_SOURCE_DIR}/src/proof-of-concept/proof-of-concept.c $<TARGET_OBJECTS:load_file> $<TARGET_OBJECTS:string_slice> $<TARGET_OBJECTS:xml_output>)
 
 add_library(tokenizer_test src/tokenizer/tokenizer.c src/tokenizer/tokenizer.h $<TARGET_OBJECTS:string_slice>)
