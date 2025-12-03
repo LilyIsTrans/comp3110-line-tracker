@@ -6,7 +6,7 @@
   *
   *	 xml_file:	file to track
   */
-void xml_set_output_file(FILE *xml_file);
+void set_xml_output_file(FILE *xml_file);
 
 /**
   *  starts a new XML version block for the given file.
@@ -25,7 +25,5 @@ void start_version_block(const char* filename, int id);
 void write_location(int old_line, int new_line);
 
 
-/**
-  *  ends the current XML version block.
-  */
+//ends the current XML version block.
 void end_version_block(void);
