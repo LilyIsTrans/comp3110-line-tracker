@@ -63,6 +63,7 @@ void closestLine(Line str1, Line strs[], int strscount, Line* best, double* best
     }
 }
 
+/*
 int main(int argc, const char **argv) {
     Line str1 = {"a b c", "abcdef", "d e f"};
     Line strs[] =  {
@@ -80,3 +81,4 @@ int main(int argc, const char **argv) {
     
     return 0;
 }
+*/
