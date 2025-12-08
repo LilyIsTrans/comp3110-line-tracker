@@ -23,6 +23,3 @@ int levenshteinDistance(const char* str1,
     takes in the string, a list of strings to compare to, the length of the list, and a pointer to a char array and int to store the best candidate and its score
 */
 void closestLine(Line str1, Line strs[], int strscount, Line* best, double* bestDiff);
-
-// using main in this program to test closestLine
-int main(int argc, const char **argv);

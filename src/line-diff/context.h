@@ -42,6 +42,3 @@ typedef struct {
     takes in a query and a list of candidates (and the length of this list)
 */
 comparisonResult* compare_all_pairs(char* query, char** strings, int num_strings);
-
-// temporary main function to test the program
-int main();

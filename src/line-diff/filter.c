@@ -1,13 +1,14 @@
-#include "distance.c"
-#include "context.c"
-#include "../string-slice/string-slice.c"
+#include "distance.h"
+#include "context.h"
+#include "filter.h"
+#include "../string-slice/string-slice.h" // note: have to link this when compiling based on my testing
 #include <stdio.h>
 #include <inttypes.h>
 
 #define MAX_CANDIDATES 15
 
 uint32_t simhash(Substring *str) {
-     int32_t vector[32] = {0};
+    int32_t vector[32] = {0};
     
     uint32_t hash = 0;
     for (const char* s = str->start; s < str->end; s++) {
@@ -110,37 +111,37 @@ int main(int argc, const char **argv) {
     base.start = "x = 5 + 5";
     base.end = base.start + strlen(base.start);
     char* canstrings[] = {
-      "x = 5 + 3",
-      "y = 5 - 3",
-      "z = x * y",
-      "result = z / 2",
-      "print('Result:', result)",
-      "a = 10 + 3",
-      "b = 10 - 3",
-      "c = a * b",
-      "output = c / 2",
-      "print('Output:', output)",
-      "count = 0",
-      "count = count + 1",
-      "index = 0",
-      "index = index + 1",
-      "list_a = [1, 2, 3]",
-      "list_b = [4, 5, 6]",
-      "combined = list_a + list_b",
-      "first = list_a[0]",
-      "last = list_b[-1]",
-      "if x > y:",
-      " print('x is larger')",
-      "elif a > b:",
-      " print('a is larger')",
-      "else:",
-      " print('none larger')"
+        "x = 5 + 3",
+        "y = 5 - 3",
+        "z = x * y",
+        "result = z / 2",
+        "print('Result:', result)",
+        "a = 10 + 3",
+        "b = 10 - 3",
+        "c = a * b",
+        "output = c / 2",
+        "print('Output:', output)",
+        "count = 0",
+        "count = count + 1",
+        "index = 0",
+        "index = index + 1",
+        "list_a = [1, 2, 3]",
+        "list_b = [4, 5, 6]",
+        "combined = list_a + list_b",
+        "first = list_a[0]",
+        "last = list_b[-1]",
+        "if x > y:",
+        " print('x is larger')",
+        "elif a > b:",
+        " print('a is larger')",
+        "else:",
+        " print('none larger')"
     };
     struct SubstringArray* candidates = new_substring_array(25);
     Substring canlist[25];
     for (int i=0; i<25; i++) {
-      canlist[i].start = canstrings[i];
-      canlist[i].end = canlist[i].start+strlen(canlist[i].start);
+        canlist[i].start = canstrings[i];
+        canlist[i].end = canlist[i].start+strlen(canlist[i].start);
     }
     candidates->len = 25;
     memcpy(candidates->array, canlist, sizeof(Substring)*25);
@@ -151,61 +152,3 @@ int main(int argc, const char **argv) {
     }
     return 0;
 }
-
-
-/*
-//calculates FNV-1 hash for substrings
-uint32_t fnv1_hash(Substring str) {
-  const uint32_t FNV_OFFSET_BASIS = 0x811c9dc5; // Pulled from https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV_hash_parameters
-  const uint32_t FNV_PRIME = 0x01000193; // Pulled from https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV_hash_parameters
-
-  uint32_t hash = FNV_OFFSET_BASIS;
-
-  for (; str.start < str.end; str.start++) {
-    hash *= FNV_PRIME;
-    hash ^= (uint32_t)(*str.start);
-  }
-
-  return hash;
-  
-}
-
-
-typedef struct {
-  const char* start;
-  const char* end;
-} Substring;
-
-//define an entry in hash table
-struct SubstringHashTableEntry {
-  Substring str;
-  uint32_t line_numbers_len;
-  uint32_t hash;
-};
-
-//define the layout of hash table
-struct SubstringHashTable {
-  /// Must always be a power of 2
-  size_t capacity;
-  /// The number of elements actually currently in the table
-  size_t load;
-  struct SubstringHashTableEntry table[];
-};
-
-
-struct SubstringHashTable *reallocate_substring_hash_table(struct SubstringHashTable* old_table) {
-  struct SubstringHashTable* new_table = new_substring_hash_table(old_table->capacity * 2);
-  size_t entries_moved = 0;
-  
-  //copy entries from old table to new table
-  for (size_t i = 0; i < old_table->capacity && entries_moved < old_table->load; ++i) {
-    if (old_table->table[i].line_numbers != NULL) {
-      substring_hash_table_no_realloc_insert(new_table, old_table->table[i].str, old_table->table[i].line_numbers_len, old_table->table[i].line_numbers);
-    }
-  }
-
-  free(old_table); // `substring_hash_table_no_realloc_insert` takes ownership of all the internal pointers, so this is the correct
-  // action, not the more complicated hash table free (which would actually be undefined behaviour).
-  return new_table;
-}
-*/
