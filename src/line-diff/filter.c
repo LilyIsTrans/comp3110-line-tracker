@@ -105,7 +105,7 @@ struct SubstringArray* filterCandidates(Substring *str, struct SubstringArray *c
     filtered->len = filled;
     return filtered;
 }
-
+/*
 int main(int argc, const char **argv) {
     Substring base;
     base.start = "x = 5 + 5";
@@ -152,3 +152,4 @@ int main(int argc, const char **argv) {
     }
     return 0;
 }
+    */

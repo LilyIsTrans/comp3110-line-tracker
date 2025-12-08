@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
-
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 int levenshteinDistance(const char* str1,
                         const char* str2) {
