@@ -45,3 +45,7 @@ add_executable(file_line_test ${CMAKE_SOURCE_DIR}/src/tests/unit/line-numbers.c 
 add_executable(proof-of-concept  ${CMAKE_SOURCE_DIR}/src/proof-of-concept/proof-of-concept.c $<TARGET_OBJECTS:load_file> $<TARGET_OBJECTS:string_slice>)
 
 add_library(tokenizer_test src/tokenizer/tokenizer.c src/tokenizer/tokenizer.h $<TARGET_OBJECTS:string_slice>)
+
+add_library(xml_output OBJECT src/xml-output/xml-output.c src/xml-output/xml-output.h)
+add_executable(xml_output_test ${CMAKE_SOURCE_DIR}/src/tests/unit/xml-output-test.c  $<TARGET_OBJECTS:xml_output>)
+add_test(NAME XmlOutputTest COMMAND xml_output_test)
