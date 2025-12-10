@@ -1,0 +1,29 @@
+<TEST NAME="TEST6" FILE="fb-test6.java">
+
+<VERSION NUMBER="1" CHECKED="TRUE">
+
+    <LOCATION ORIG="66" NEW="66" />
+    <LOCATION ORIG="74" NEW="74" />
+    <LOCATION ORIG="85" NEW="85" />
+
+</VERSION>
+
+<VERSION NUMBER="2" CHECKED="TRUE">	
+
+    <LOCATION ORIG="-1" NEW="16" />
+    <LOCATION ORIG="-1" NEW="17" />
+    <LOCATION ORIG="66" NEW="75" />
+    <LOCATION ORIG="-1" NEW="68" />
+    <LOCATION ORIG="-1" NEW="74" />
+    <LOCATION ORIG="-1" NEW="76" />
+    <LOCATION ORIG="-1" NEW="77" />
+    <LOCATION ORIG="-1" NEW="78" />
+    <LOCATION ORIG="-1" NEW="79" />
+    <LOCATION ORIG="-1" NEW="80" />
+    <LOCATION ORIG="-1" NEW="81" />
+    <LOCATION ORIG="74" NEW="84" />
+    <LOCATION ORIG="85" NEW="95" />
+    <LOCATION ORIG="85" NEW="96" />
+
+</VERSION>
+</TEST>
