@@ -155,3 +155,42 @@ struct HashTablePerformanceHeuristics *get_substring_hash_table_performance_heur
 void free_substring_hash_table(struct SubstringHashTable* table);
 
 
+
+
+
+
+
+
+
+
+
+
+
+// `lines` and `strings` have identical length and capacity and corresponding entries; any modification to one
+// should have a corresponding modification to the other to maintain synchronicity.
+struct SubstringWithOriginLineArray;
+
+// Allocates the underlying arrays in a `SubstringWithOriginLineArray`
+void malloc_substring_with_origin_line_array(struct SubstringWithOriginLineArray*, size_t size);
+
+// Reallocates the underlying arrays in a `SubstringWithOriginLineArray`. May invalidate the old pointers.
+void realloc_substring_with_origin_line_array(struct SubstringWithOriginLineArray*, size_t new_size);
+
+// Frees the underlying array of a `SubstringWithOriginLineArray`. DOES NOT free the actual passed pointer,
+// as it's perfectly valid for that to live on the stack; if it's heap allocated, the caller must free it
+// themselves.
+void free_substring_with_origin_line_array(struct SubstringWithOriginLineArray*);
+
+size_t substring_with_origin_line_array_get_length(struct SubstringWithOriginLineArray*);
+size_t substring_with_origin_line_array_get_origin_line(struct SubstringWithOriginLineArray*, size_t index);
+Substring substring_with_origin_line_array_get_substring(struct SubstringWithOriginLineArray*, size_t index);
+
+
+/// Returns an array of lines from `old_file_lines` which were found nowhere in `new_file_lines`
+struct SubstringWithOriginLineArray unmatched_lines(struct SubstringArray *old_file_lines, struct SubstringArray *new_file_lines);
+
+
+
+
+
+
