@@ -504,3 +504,27 @@ size_t substring_with_origin_line_array_get_origin_line(struct SubstringWithOrig
 Substring substring_with_origin_line_array_get_substring(struct SubstringWithOriginLineArray* arr, size_t index) {
   return arr->strings[index];
 }
+struct SubstringWithOriginLine substring_with_origin_line_array_get(struct SubstringWithOriginLineArray* arr, size_t index) {
+  return (struct SubstringWithOriginLine){arr->strings[index], arr->lines[index]};
+}
+struct SubstringWithOriginLine substring_with_origin_line_array_pop_at(struct SubstringWithOriginLineArray* arr, size_t index) {
+  struct SubstringWithOriginLine output = {arr->strings[index], arr->lines[index]};
+  if (arr->len - 1 != index) {
+    memmove(&arr->lines[index], &arr->lines[index + 1], ((arr->len - 1) - index) * sizeof(arr->lines[index]));
+    memmove(&arr->strings[index], &arr->strings[index + 1], ((arr->len - 1) - index) * sizeof(arr->strings[index]));
+  }
+  arr->len -= 1;
+  return output;
+}
+void substring_with_origin_line_array_insert(struct SubstringWithOriginLineArray* arr, size_t index, Substring str, size_t origin_line) {
+  if (arr->len == arr->capacity) {
+    realloc_substring_with_origin_line_array(arr, arr->len * 2);
+  }
+  if (arr->len > index) {
+    memmove(&arr->lines[index + 1], &arr->lines[index], ((arr->len) - index) * sizeof(arr->lines[index]));
+    memmove(&arr->strings[index + 1], &arr->strings[index], ((arr->len) - index) * sizeof(arr->strings[index]));
+  }
+  arr->lines[index] = origin_line;
+  arr->strings[index] = str;
+  arr->len += 1;
+}

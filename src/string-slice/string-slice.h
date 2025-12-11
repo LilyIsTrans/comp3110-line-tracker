@@ -165,7 +165,10 @@ void free_substring_hash_table(struct SubstringHashTable* table);
 
 
 
-
+struct SubstringWithOriginLine {
+  Substring str;
+  size_t origin_line;
+};
 // `lines` and `strings` have identical length and capacity and corresponding entries; any modification to one
 // should have a corresponding modification to the other to maintain synchronicity.
 struct SubstringWithOriginLineArray;
@@ -184,6 +187,9 @@ void free_substring_with_origin_line_array(struct SubstringWithOriginLineArray*)
 size_t substring_with_origin_line_array_get_length(struct SubstringWithOriginLineArray*);
 size_t substring_with_origin_line_array_get_origin_line(struct SubstringWithOriginLineArray*, size_t index);
 Substring substring_with_origin_line_array_get_substring(struct SubstringWithOriginLineArray*, size_t index);
+struct SubstringWithOriginLine substring_with_origin_line_array_get(struct SubstringWithOriginLineArray*, size_t index);
+struct SubstringWithOriginLine substring_with_origin_line_array_pop(struct SubstringWithOriginLineArray*, size_t index);
+void substring_with_origin_line_array_insert(struct SubstringWithOriginLineArray*, size_t index, Substring str, size_t origin_line);
 
 
 /// Returns an array of lines from `old_file_lines` which were found nowhere in `new_file_lines`
