@@ -1,4 +1,5 @@
 #include "../line-diff/distance.h"
+#include "../string-slice/string-slice.h"
 #include "detect-split.h"
 #include <stdio.h>
 
@@ -24,15 +25,24 @@ char* combineStrings(char** strs, int len) {
     return combined;
 }
 
-void checkSplit(char* str, char* strs[], int strscount, int* best, double* bestDiff) {
+char* combineSubstrings(Substring* strs, int len) {
+    char* combined = (char*)strs[0].start;
+    for (int i=1; i<len; i++) {
+        char* toCombine[] = {combined, (char*)strs[i].start}; 
+        combined = combineStrings(toCombine, 2);
+    }
+    return combined;
+}
+void checkSplit(Substring str, Substring strs[], int strscount, int* best, double* bestDiff) {
     double cur = 0;
     double prev;
     int combined=2;
     do {
         prev = cur;
-        char* merged = combineStrings(strs, combined);
-        cur = (double)levenshteinDistance(str, merged);
-        cur /= max(strlen(str), strlen(merged)); // % different between lines
+        char* merged = combineSubstrings(strs, combined);
+        Substring mergedSubstring = {.start=merged, .end=merged+strlen(merged)};
+        cur = (double)levenshteinDistance(str, mergedSubstring);
+        cur /= max(str.end-str.start, strlen(merged)); // % different between lines
         cur = 1-cur; // % similarity between lines
         combined++;
     } while (cur > prev && combined < strscount);
@@ -41,7 +51,7 @@ void checkSplit(char* str, char* strs[], int strscount, int* best, double* bestD
     *bestDiff = prev;
     *best = combined-2;
 }
-
+/*
 int main(int argc, const char **argv) {
     char* str = "for (const char* p = tokens->array[i].start; p < tokens->array[i].end; p++) {";
     char* strs[] = {"for (\n",
@@ -68,3 +78,4 @@ int main(int argc, const char **argv) {
     printf("combined %d strings with %.3f similarity.\nCompared %s and %s\n", best, diff, str, combineStrings(badstrs, best));
     return 0;
 }
+    */

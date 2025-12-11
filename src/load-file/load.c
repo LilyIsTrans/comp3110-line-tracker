@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct LoadedFile;
 
 #if (defined(__unix) || defined(__unix__)) && !defined(FORCE_PORTABLE_FALLBACK)
 #include <sys/mman.h>
@@ -11,13 +12,6 @@
 #include <unistd.h>
 #include <errno.h>
 
-struct LoadedFile {
-  const char* data;
-  size_t length: sizeof(size_t) * 8 - 1;
-  // If true, file is `mmap`ed, and must be `munmap`ed to cleanup.
-  // If false, file is `malloc`ed, and must be `free`d to cleanup.
-  bool mapped: 1;
-};
 
 struct LoadedFile* load_from_filename(const char* const filename) {
   int filedesc = open(filename, O_RDONLY);
@@ -88,11 +82,6 @@ void unload_file(struct LoadedFile *file) {
 #include <stdio.h>
 #include <errno.h>
 
-
-struct LoadedFile {
-  const char* data;    //hold contents of file
-  size_t length;       //size of file (bytes)
-};
 
 struct LoadedFile* load_from_filename(const char* const filename) {
   FILE* file = fopen(filename, "rb");

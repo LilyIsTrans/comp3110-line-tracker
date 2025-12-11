@@ -171,7 +171,12 @@ struct SubstringWithOriginLine {
 };
 // `lines` and `strings` have identical length and capacity and corresponding entries; any modification to one
 // should have a corresponding modification to the other to maintain synchronicity.
-struct SubstringWithOriginLineArray;
+struct SubstringWithOriginLineArray {
+  size_t len;
+  size_t capacity;
+  size_t *lines;
+  Substring *strings;
+};
 
 // Allocates the underlying arrays in a `SubstringWithOriginLineArray`
 void malloc_substring_with_origin_line_array(struct SubstringWithOriginLineArray*, size_t size);

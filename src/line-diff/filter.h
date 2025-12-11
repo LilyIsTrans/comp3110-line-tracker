@@ -11,6 +11,4 @@ uint32_t simhash(Substring *str);
 
 int hammingDistance(uint32_t a, uint32_t b);
 
-struct SubstringArray* filterCandidates(Substring *str, struct SubstringArray *candidates);
-
-int main(int argc, const char **argv);
+struct SubstringWithOriginLineArray* filterCandidates(Substring *str, struct SubstringWithOriginLineArray *candidates);
