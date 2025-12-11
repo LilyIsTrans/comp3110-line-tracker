@@ -10,7 +10,7 @@ int levenshteinDistance(Substring str1,
                         Substring str2) {
 
     int len1 = str1.end - str1.start;
-    int len2 = str1.end - str1.start;
+    int len2 = str2.end - str2.start;
 
     if (len2 < len1) {
         return levenshteinDistance(str2, str1);

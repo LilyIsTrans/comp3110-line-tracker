@@ -201,7 +201,7 @@ void substring_with_origin_line_array_insert(struct SubstringWithOriginLineArray
 struct SubstringWithOriginLineArray unmatched_lines(struct SubstringArray *old_file_lines, struct SubstringArray *new_file_lines);
 
 
-
+struct SubstringWithOriginLine substring_with_origin_line_array_pop_at(struct SubstringWithOriginLineArray* arr, size_t index);
 
 
 

@@ -7,14 +7,57 @@
 #include "main.h"
 #include <stdio.h>
 
-#define MIN_SIMILARITY 0.5
+#define MIN_SIMILARITY 0.4
+#define MAX_SPLIT 10
 
 char* substring_to_cstring(Substring s) {
+    const char *p = s.start;
     size_t len = s.end - s.start;
-    char* result = malloc(len + 1);
+
+    // First pass: figure out how long the escaped string will be
+    size_t out_len = 0;
+    for (size_t i = 0; i < len; i++, p++) {
+        unsigned char c = (unsigned char)*p;
+        if (c == '\n' || c == '\r' || c == '\t' ||
+            c == '\\' || c == '\"') {
+            out_len += 2;          // e.g. \n, \t, \\, \"
+        } else if (iscntrl(c)) {
+            out_len += 4;          // e.g. \x1B
+        } else {
+            out_len += 1;
+        }
+    }
+
+    char *result = malloc(out_len + 1);
     if (!result) return NULL;
-    memcpy(result, s.start, len);
-    result[len] = '\0';
+
+    // Second pass: actually write escaped characters
+    p = s.start;
+    char *q = result;
+    for (size_t i = 0; i < len; i++, p++) {
+        unsigned char c = (unsigned char)*p;
+        switch (c) {
+            case '\n':
+                *q++ = ' '; break;
+            case '\r':
+                *q++ = ' '; break;
+            case '\t':
+                *q++ = ' '; *q++ = ' '; break;
+            case '\\':
+                *q++ = '\\'; break;
+            case '\"':
+                *q++ = '\"'; break;
+            default:
+                if (iscntrl(c)) {
+                    // Hex escape for other control chars
+                    sprintf(q, "\\x%02X", c);
+                    q += 4;
+                } else {
+                    *q++ = c;
+                }
+        }
+    }
+    *q = '\0';
     return result;
 }
 
@@ -124,7 +167,7 @@ int main(int argc, const char **argv) {
             // calculates distance for split string
             double splitSimilarity;
             int best = 0;
-            checkSplit(curString, candidateInContextSubstring, new_file_lines->len - candidateLine, &best, &splitSimilarity);
+            checkSplit(curString, candidateInContextSubstring, min(MAX_SPLIT, new_file_lines->len - candidateLine), &best, &splitSimilarity);
             // compares distances and chooses the closer option
             if (singleSimilarity>splitSimilarity) {
                 best = 1;
@@ -252,7 +295,6 @@ int main(int argc, const char **argv) {
                 maxCandidate = candidate;
                 maxCandidateLine = candidateLine;
                 maxSplitLines = best;
-                printf("Splits: %d\n", best);
             }
         }
         // if the closest candidate is above some threshold, they are a match
@@ -264,7 +306,9 @@ int main(int argc, const char **argv) {
                 printf("Modified %s at line %d to %s at %d\n", substring_to_cstring(curString), (int)curLine, substring_to_cstring(maxCandidate), (int)maxCandidateLine);
             }
             // remove from list of candidates
-
+            for (int k=0; k<maxSplitLines; k++) {
+                substring_with_origin_line_array_pop_at(&allCandidates, maxCandidateLine+k);
+            }
         } else { // if not, the line is removed in version 2
             // removal
             printf("Remove %s from line %d\n", substring_to_cstring(curString), (int)curLine);
