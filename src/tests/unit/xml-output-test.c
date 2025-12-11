@@ -12,17 +12,16 @@ int main(void) {
     }
 
     //set output file
-    set_xml_output_file(test_file);
 
     //start block
-    start_version_block("sample_file_name.c", 1);
+    start_version_block(test_file, "sample_file_name.c", 1);
 
     //example location entries:
-    write_location(10, 11);
-    write_location(25, 30);
+    write_location(test_file, 10, 11);
+    write_location(test_file, 25, 30);
 
     //end block
-    end_version_block();
+    end_version_block(test_file);
 
     fclose(test_file);
 
