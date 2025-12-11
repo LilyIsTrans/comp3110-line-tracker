@@ -7,8 +7,13 @@
   * Owns the entire contents of a loaded file.
   *
   */
-struct LoadedFile;
-
+struct LoadedFile {
+  const char* data;
+  size_t length: sizeof(size_t) * 8 - 1;
+  // If true, file is `mmap`ed, and must be `munmap`ed to cleanup.
+  // If false, file is `malloc`ed, and must be `free`d to cleanup.
+  bool mapped: 1;
+};
 /**
   * Attempts to create a new LoadedFile from the given filename.
   * Makes every attempt to do as little work as possible in this process.

@@ -48,9 +48,11 @@ int hammingDistance(uint32_t a, uint32_t b) {
     return dist;
 }
 
-struct SubstringArray* filterCandidates(Substring *str, struct SubstringArray *candidates) {
-    struct SubstringArray* filtered = new_substring_array(MAX_CANDIDATES);
-    Substring *res = filtered->array;
+struct SubstringWithOriginLineArray* filterCandidates(Substring *str, struct SubstringWithOriginLineArray *candidates) {
+    struct SubstringWithOriginLineArray* filtered = malloc(sizeof(struct SubstringWithOriginLineArray));
+    malloc_substring_with_origin_line_array(filtered, MAX_CANDIDATES);
+    Substring *res = filtered->strings;
+    size_t *lines = filtered->lines;
     int resDist[MAX_CANDIDATES];
     
     // Initialize all to -1
@@ -60,9 +62,10 @@ struct SubstringArray* filterCandidates(Substring *str, struct SubstringArray *c
     
     int filled = 0;
     Substring candidate;
-    
+    size_t line;
     for (int i = 0; i < candidates->len; i++) {
-        candidate = candidates->array[i];
+        candidate = candidates->strings[i];
+        line = candidates->lines[i];
         int dist = hammingDistance(simhash(str), simhash(&candidate));
         
         // If we haven't filled the array yet, just add it
@@ -86,6 +89,7 @@ struct SubstringArray* filterCandidates(Substring *str, struct SubstringArray *c
             
             resDist[pos] = dist;
             res[pos] = candidate;
+            lines[pos] = line;
             filled++;
         } else {
             // Array is full, replace if this is better than the worst

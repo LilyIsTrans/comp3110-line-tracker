@@ -1,15 +1,16 @@
 #include "distance.h"
 #include "context.h"
+#include "../string-slice/string-slice.h"
 #include <stdio.h>
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
-int levenshteinDistance(const char* str1,
-                        const char* str2) {
+int levenshteinDistance(Substring str1,
+                        Substring str2) {
 
-    int len1 = strlen(str1);
-    int len2 = strlen(str2);
+    int len1 = str1.end - str1.start;
+    int len2 = str2.end - str2.start;
 
     if (len2 < len1) {
         return levenshteinDistance(str2, str1);
@@ -28,7 +29,7 @@ int levenshteinDistance(const char* str1,
         currRow[0] = i;
 
         for (int j = 1; j <= len1; j++) {
-            if (str1[j - 1] == str2[i - 1]) {
+            if (str1.start[j - 1] == str2.start[i - 1]) {
                 currRow[j] = prevRow[j - 1];
             }
             else {
@@ -45,7 +46,7 @@ int levenshteinDistance(const char* str1,
     free(prevRow);
     return res;
 }
-
+/*
 void closestLine(Line str1, Line strs[], int strscount, Line* best, double* bestDiff) {
     *bestDiff = -1;
     for(int i=0; i<strscount; i++) {
@@ -63,7 +64,7 @@ void closestLine(Line str1, Line strs[], int strscount, Line* best, double* best
     }
 }
 
-/*
+
 int main(int argc, const char **argv) {
     Line str1 = {"a b c", "abcdef", "d e f"};
     Line strs[] =  {
