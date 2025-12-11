@@ -49,7 +49,7 @@ int hammingDistance(uint32_t a, uint32_t b) {
 }
 
 struct SubstringWithOriginLineArray* filterCandidates(Substring *str, struct SubstringWithOriginLineArray *candidates) {
-    struct SubstringWithOriginLineArray* filtered;
+    struct SubstringWithOriginLineArray* filtered = malloc(sizeof(struct SubstringWithOriginLineArray));
     malloc_substring_with_origin_line_array(filtered, MAX_CANDIDATES);
     Substring *res = filtered->strings;
     size_t *lines = filtered->lines;

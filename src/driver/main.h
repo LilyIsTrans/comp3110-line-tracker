@@ -9,4 +9,6 @@
 
 #define MIN_SIMILARITY 0.5
 
+char* substring_to_cstring(Substring s);
+
 int main(int argc, const char **argv);

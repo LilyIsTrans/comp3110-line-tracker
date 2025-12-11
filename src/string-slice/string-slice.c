@@ -189,7 +189,7 @@ struct SubstringHashTable *new_substring_hash_table(size_t capacity) {
   output->load = 0;
   output->capacity = capacity;
 
-  memset(output->table, 0, capacity);
+  memset(output->table, 0, capacity * sizeof(struct SubstringHashTableEntry));
   return output;
 }
 
@@ -454,40 +454,47 @@ void free_substring_with_origin_line_array(
 struct SubstringWithOriginLineArray 
 unmatched_lines(struct SubstringArray *old_file_lines,
                 struct SubstringArray *new_file_lines) {
-  printf("a\n");
   size_t hash_table_size = new_file_lines->len;
   {
-    size_t mask =
-        ~((size_t)(-1) >>
-          1); // Set mask to have a single 1 bit in the most significant
-              // position followed by however many trailing zeroes are necessary
+    size_t mask = ~((size_t)(-1) >> 1);
     while ((mask & hash_table_size) == 0) {
       mask >>= 1;
     }
     hash_table_size = mask << 1;
   };
-  printf("b\n");
-  struct SubstringHashTable *new_lines_table =
-      new_substring_hash_table(hash_table_size);
-
+  
+  struct SubstringHashTable *new_lines_table = new_substring_hash_table(hash_table_size);
+  
+  if (!new_lines_table) {
+    struct SubstringWithOriginLineArray empty = {0};
+    return empty;
+  }
+  
   for (size_t i = 0; i < new_file_lines->len; ++i) {
     if (new_file_lines->array[i].end != new_file_lines->array[i].start) {
-      printf("c");
       size_t *I = malloc(sizeof(size_t));
       *I = i;
+      
       new_lines_table = insert_into_substring_hash_table(
           new_lines_table, new_file_lines->array[i], I);
+      
+      if (!new_lines_table) {
+        free(I);
+        break;
+      }
     }
   }
 
-  printf("d\n");
   struct SubstringWithOriginLineArray output;
   malloc_substring_with_origin_line_array(&output, old_file_lines->len);
-  printf("e\n");
+  
   for (size_t i = 0; i < old_file_lines->len; ++i) {
-    if (substring_hash_table_get_entry(new_lines_table, old_file_lines->array[i]).size == 0) {
+    
+    struct SimpleSizeTArray entry = substring_hash_table_get_entry(
+        new_lines_table, old_file_lines->array[i]);
+    
+    if (entry.size == 0) {
       if (output.len >= output.capacity) {
-        printf("f\n");
         realloc_substring_with_origin_line_array(&output, output.capacity * 2);
       }
       output.lines[output.len] = i;
@@ -495,12 +502,13 @@ unmatched_lines(struct SubstringArray *old_file_lines,
       output.len++;
     }
   }
-  printf("g\n");
+  
   if (output.len != output.capacity) {
     realloc_substring_with_origin_line_array(&output, output.len);
   }
+  
   free_substring_hash_table(new_lines_table);
-  printf("h\n");
+  
   return output;
 }
 size_t substring_with_origin_line_array_get_length(struct SubstringWithOriginLineArray* arr) {
