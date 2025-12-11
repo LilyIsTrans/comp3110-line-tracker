@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-#if (defined(__linux__) || defined(__linux)) && !defined(FORCE_PORTABLE_FALLBACK)
+#if (defined(__unix) || defined(__unix__)) && !defined(FORCE_PORTABLE_FALLBACK)
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
