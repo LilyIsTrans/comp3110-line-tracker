@@ -5,7 +5,7 @@
 int main(void) {
 
     //temp file for test purposes
-    FILE* test_file = fopen("xml_output_test.xml", "w");
+    FILE* test_file = fopen("xml_output_test.xml", "a");
     if (!test_file) {
         perror("Failed to open test file");
         return EXIT_FAILURE;
