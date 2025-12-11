@@ -83,7 +83,140 @@ void unload_file(struct LoadedFile *file) {
     free(file);
   }
 }
+#elif defined(__WIN64) || defined(__WIN64__)
+#define WIN32_LEAN_AND_MEAN
+#include <handleapi.h>
+#include <memoryapi.h>
+#include <processthreadsapi.h>
+#include <windows.h>
+#include <windef.h>
+#include <memoryapi.h>
+#include <fileapi.h>
+#include <winnt.h>
+struct LoadedFile {
+  const char* data;
+  size_t length: sizeof(size_t) * 8 - 1;
+  // If true, file is `mmap`ed, and must be `munmap`ed to cleanup.
+  // If false, file is `malloc`ed, and must be `free`d to cleanup.
+  bool mapped: 1;
+};
 
+struct LoadedFile* load_from_filename(const char* const filename) {
+  struct LoadedFile *output = malloc(sizeof(struct LoadedFile));
+  HANDLE file = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (file == NULL) {
+    fprintf(stderr, "Failed to open file '%s'!\n", filename);
+    // Code from https://learn.microsoft.com/en-us/windows/win32/debug/retrieving-the-last-error-code
+    char *lpMsgBuf;
+    DWORD dw = GetLastError(); 
+
+    if (FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL) == 0) {
+        fprintf(stderr, "Failed to even format the error!! Yikes!!\n");
+        ExitProcess(dw);
+    }
+
+    fprintf(stderr, "Failed to open file BECAUSE: %s\n", lpMsgBuf);
+    LocalFree(lpMsgBuf);
+    ExitProcess(dw);
+  }
+  HANDLE mapping = CreateFileMapping2(file, NULL, FILE_MAP_READ, PAGE_READONLY, 0, 0, NULL, NULL, 0);
+  if (mapping == NULL) {
+    fprintf(stderr, "Failed to map file '%s'!\n", filename);
+    char* lpMsgBuf;
+    DWORD dw = GetLastError(); 
+
+    if (FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL) == 0) {
+        fprintf(stderr, "Failed to even format the error!! Yikes!!\n");
+        ExitProcess(dw);
+    }
+
+    fprintf(stderr, "Failed to map file BECAUSE: %s\n", lpMsgBuf);
+    LocalFree(lpMsgBuf);
+    ExitProcess(dw);
+  }
+
+  output->data = MapViewOfFile(mapping, FILE_MAP_COPY, 0, 0, 0);
+  if (output->data == NULL) {
+    fprintf(stderr, "Failed to map view of file '%s'!\n", filename);
+    char* lpMsgBuf;
+    DWORD dw = GetLastError(); 
+
+    if (FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL) == 0) {
+        fprintf(stderr, "Failed to even format the error!! Yikes!!\n");
+        ExitProcess(dw);
+    }
+
+    fprintf(stderr, "Failed to map view of file BECAUSE: %s\n", lpMsgBuf);
+    LocalFree(lpMsgBuf);
+    ExitProcess(dw);
+    
+  }
+  output->mapped = true;
+  LARGE_INTEGER len;
+  if (!GetFileSizeEx(file, &len)) {
+    fprintf(stderr, "Failed to map view of file '%s'!\n", filename);
+    char *lpMsgBuf;
+    DWORD dw = GetLastError(); 
+
+    if (FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL) == 0) {
+        fprintf(stderr, "Failed to even format the error!! Yikes!!\n");
+        ExitProcess(dw);
+    }
+
+    fprintf(stderr, "Failed to map view of file BECAUSE: %s\n", lpMsgBuf);
+    LocalFree(lpMsgBuf);
+    ExitProcess(dw);    
+    
+  }
+  output->length = (size_t)len.HighPart << 8 * sizeof(len.HighPart) | (size_t)len.LowPart;
+  CloseHandle(file);
+  CloseHandle(mapping);
+
+  return output;
+}
+
+void unload_file(struct LoadedFile *file) {
+  if (file->mapped) {
+    UnmapViewOfFile(file->data);
+    free(file);
+  }
+  else {
+    free((void*)file->data);
+    free(file);
+  }
+}
 #else
 #include <stdio.h>
 #include <errno.h>
