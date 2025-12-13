@@ -49,3 +49,10 @@ add_library(tokenizer_test src/tokenizer/tokenizer.c src/tokenizer/tokenizer.h $
 add_library(xml_output OBJECT src/xml-output/xml-output.c src/xml-output/xml-output.h)
 add_executable(xml_output_test ${CMAKE_SOURCE_DIR}/src/tests/unit/xml-output-test.c  $<TARGET_OBJECTS:xml_output>)
 add_test(NAME XmlOutputTest COMMAND xml_output_test)
+
+
+add_library(line_diff OBJECT ${CMAKE_SOURCE_DIR}/src/line-diff/context.c ${CMAKE_SOURCE_DIR}/src/line-diff/context.h ${CMAKE_SOURCE_DIR}/src/line-diff/distance.c ${CMAKE_SOURCE_DIR}/src/line-diff/distance.h ${CMAKE_SOURCE_DIR}/src/line-diff/filter.c ${CMAKE_SOURCE_DIR}/src/line-diff/filter.h)
+add_library(split_lines OBJECT ${CMAKE_SOURCE_DIR}/src/split-lines/detect-split.c ${CMAKE_SOURCE_DIR}/src/split-lines/detect-split.h)
+
+add_executable(driver ${CMAKE_SOURCE_DIR}/src/driver/main.c ${CMAKE_SOURCE_DIR}/src/driver/main.h $<TARGET_OBJECTS:line_diff> $<TARGET_OBJECTS:load_file> $<TARGET_OBJECTS:string_slice> $<TARGET_OBJECTS:xml_output> $<TARGET_OBJECTS:split_lines>)
+target_link_libraries(driver m)
