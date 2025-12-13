@@ -53,3 +53,30 @@ FB-test52: https://github.com/Priler/dino3d/blob/9f1e3eca78f966a3da0a7af1ba64680
 TEST 6
 FB-test61: https://github.com/helloRupa/memory-game/blob/a9b3e59d06dee67b5ae954614c80c39aaaa5e9cd/lib/game.rb 
 FB-test62: https://github.com/helloRupa/memory-game/blob/6573bdd44030b4655eeccfaeb8efb42e0a2ca336/lib/game.rb
+
+Reference of Source of em Test Code
+
+TEST 1
+em-test11: https://github.com/kubowania/battleships/blob/2064edd41cfe80ccb6c2575c86d794924713a9f0/public/app.js
+em-test12: https://github.com/kubowania/battleships/blob/650550a8a24e279da1ec28f0f2fbb9f06d54003e/public/app.js
+
+TEST 2
+em-test21: https://github.com/almostimplemented/checkers/blob/4952576bb8d37aa83ce44f8c5c0fa0f943406325/checkers.py
+em-test22: https://github.com/almostimplemented/checkers/blob/21f396a29003a586627395ed017d11fe2b358037/checkers.py
+
+TEST 3
+em-test31: https://github.com/intrepidcoder/monopoly/blob/7e2fd67397873682e285543fe705dc8597067e73/ai.js
+em-test32: https://github.com/intrepidcoder/monopoly/blob/6ae7969a78901b754f0f0ad2e19eed937ebe2754/ai.js
+
+TEST 4
+em-test41: https://github.com/beta-robots/webcam_circles/blob/8f55db5cd80d37c9d08cf2ba1d4e232d2d3b49e9/src/circle_detector.cpp
+em-test42: https://github.com/beta-robots/webcam_circles/blob/ca05a939885c9397cca6308fa7c3f1cb696aaa34/src/circle_detector.cpp
+
+TEST 5
+em-test51: https://github.com/mgba-emu/mgba/blob/dda5634189007653f0f5a79c7d4686c3c5be724d/src/script/canvas.c
+em-test52: https://github.com/mgba-emu/mgba/blob/9318e9b2cb1c019e8862755c0aad5675405648de/src/script/canvas.c
+
+TEST 6
+em-test61: https://github.com/cabaletta/baritone/blob/4c79701d22633d9626eb9185ddbb904803099b5a/src/main/java/baritone/process/ExploreProcess.java
+em-test62: https://github.com/cabaletta/baritone/blob/921822acd757c94d15c0081bcadee3af5b027d6e/src/main/java/baritone/process/ExploreProcess.java
+
