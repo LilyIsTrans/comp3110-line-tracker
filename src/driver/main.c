@@ -301,9 +301,9 @@ int main(int argc, const char **argv) {
         if (maxSimilarity > MIN_SIMILARITY) {
             // match
             if (maxSplitLines > 1) {
-                printf("Modified %s at line %d to %s at %d - %d\n", substring_to_cstring(curString), (int)curLine, substring_to_cstring(maxCandidate), (int)maxCandidateLine, (int)maxCandidateLine+maxSplitLines);
+                printf("Modified %s at line %zu to %s at %zu - %zu\n", substring_to_cstring(curString), curLine, substring_to_cstring(maxCandidate), maxCandidateLine, maxCandidateLine+maxSplitLines);
             } else {
-                printf("Modified %s at line %d to %s at %d\n", substring_to_cstring(curString), (int)curLine, substring_to_cstring(maxCandidate), (int)maxCandidateLine);
+                printf("Modified %s at line %zu to %s at %zu\n", substring_to_cstring(curString), curLine, substring_to_cstring(maxCandidate), maxCandidateLine);
             }
             // remove from list of candidates
             for (int k=0; k<maxSplitLines; k++) {
@@ -311,16 +311,16 @@ int main(int argc, const char **argv) {
             }
         } else { // if not, the line is removed in version 2
             // removal
-            printf("Remove %s from line %d\n", substring_to_cstring(curString), (int)curLine);
+            printf("Remove %s from line %zu\n", substring_to_cstring(curString), curLine);
             // no effect on candidates
         }
     }
     // any remaining lines in version 2 are insertions
-    for (int k = 0; k<allCandidates.len; k++) {
+    for (size_t k = 0; k<allCandidates.len; k++) {
         Substring c = allCandidates.strings[k];
         size_t l = allCandidates.lines[k];
 
-        printf("Insert %s at line %d\n", substring_to_cstring(c), (int)l);
+        printf("Insert %s at line %zu\n", substring_to_cstring(c), l);
     }
 
     return 0;
