@@ -1,0 +1,55 @@
+Reference of Source of QF Test Code
+
+TEST 1
+QF-test11: https://github.com/serenity-valley/game/blob/928663a41f20432805b04be58743553e3ff06d6a/game.py
+QF-test12: https://github.com/serenity-valley/game/blob/f6ce038cf01a535f362fc564cf349deeb1c0e0df/game.py
+
+TEST 2
+QF-test21: https://github.com/byegates/Algorithms/blob/894a81cb5ca6b22d01e289e738ebfa44b879c84a/Sudoku.java
+QF-test22: https://github.com/byegates/Algorithms/blob/521c8d1b0afd7aa7b13031737d0d7e2d39f7524b/Sudoku.java
+
+TEST 3
+QF-test31: https://github.com/cloudwu/skynet/blob/7304a990cb9fe9c32d87b00a69a1a98efef59c98/lualib-src/lua-cluster.c
+QF-test32: https://github.com/cloudwu/skynet/blob/182d7c7dc7b1547218d958a01e4eb83d3b8eaf5a/lualib-src/lua-cluster.c
+
+TEST 4
+QF-test41: https://github.com/arianne/stendhal/blob/735aad5e83e22963d6ad248f0d1e9c7322e03f1a/src/games/stendhal/common/CollisionDetection.java
+QF-test42: https://github.com/arianne/stendhal/blob/485e6260833571cdf68918d171738c0649409cd5/src/games/stendhal/common/CollisionDetection.java
+
+TEST 5
+QF-test51: https://github.com/HKUST-Aerial-Robotics/SIMPL/blob/0663e6d2c69361090adbef4d79ebe91ab81a8414/train.py
+QF-test52: https://github.com/HKUST-Aerial-Robotics/SIMPL/blob/5ae367145bac2eee27e828dc424db1e46a45dde8/train.py
+
+TEST 6
+QF-test61: https://github.com/amir650/BlackWidow-Chess/blob/13af8ffed914abbc0c79d24b8434f1ef619126a5/src/com/chess/engine/board/Board.java
+QF-test62: https://github.com/amir650/BlackWidow-Chess/blob/9bd4a61cf0daeb76fa2d1ee43f352a681bb82cba/src/com/chess/engine/board/Board.java
+
+TEST 7
+QF-test71: https://github.com/y-256/libdivsufsort/blob/0b0d08bc414f9152b0f7afac36b56b4b30e2679f/lib/divsufsort.c
+QF-test72: https://github.com/y-256/libdivsufsort/blob/361469ad541e72994cacb88e4e0f98ea74d23735/lib/divsufsort.c
+
+Reference of Source of FB Test Code
+
+TEST 1
+FB-test11: https://github.com/jcarolus/android-chess/blob/005f8620bd1c6c6e7c77ebf6403eebfec5d8b309/app/src/main/java/jwtc/android/chess/activities/ChessBoardActivity.java 
+FB-test12: https://github.com/jcarolus/android-chess/blob/7b6d48bb3b53a78d4e779f0608f9e6af21987c8b/app/src/main/java/jwtc/android/chess/activities/ChessBoardActivity.java 
+
+TEST 2
+FB-test21: https://github.com/jonkr2/GuiNN_Checkers/blob/dce6c3260a0a5d80a303f87071158f0e845aced3/src/NeuralNet/NeuralNet.cpp
+FB-test22: https://github.com/jonkr2/GuiNN_Checkers/blob/5120eb3d5d4b6a6dc62cb939cd3434146965581a/src/NeuralNet/NeuralNet.cpp
+
+TEST 3
+FB-test31: https://github.com/alxmjo/TicTacToe-Assembly/blob/11c5d9e93504a5875d49480d329820e27d04256f/TicTacToe-Assembly/TicTacToe.asm
+FB-test32: https://github.com/alxmjo/TicTacToe-Assembly/blob/02c918d286d31e9fe63112f571e10a50831af98c/TicTacToe-Assembly/TicTacToe.asm
+
+TEST 4
+FB-test41: https://github.com/gzito/galaga/blob/0887bb9211f4b1ad2f36e74e80dcf927fa2af66f/galaga/play.py
+FB-test42: https://github.com/gzito/galaga/blob/346567eb4be81cd006e9333c38779c8ddcce87af/galaga/play.py 
+
+TEST 5
+FB-test51: https://github.com/Priler/dino3d/blob/d19c744f1edfd52f87e101a068d8a2b2cc9a2854/js/src/game_manager.js 
+FB-test52: https://github.com/Priler/dino3d/blob/9f1e3eca78f966a3da0a7af1ba646804dffd5eec/js/src/game_manager.js
+
+TEST 6
+FB-test61: https://github.com/helloRupa/memory-game/blob/a9b3e59d06dee67b5ae954614c80c39aaaa5e9cd/lib/game.rb 
+FB-test62: https://github.com/helloRupa/memory-game/blob/6573bdd44030b4655eeccfaeb8efb42e0a2ca336/lib/game.rb
