@@ -7,6 +7,7 @@
 #include "../xml-output/xml-output.h"
 #include "main.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MIN_SIMILARITY 0.4
 #define MAX_SPLIT 10
@@ -63,13 +64,15 @@ char* substring_to_cstring(Substring s) {
 }
 
 int main(int argc, const char **argv) {
-    if (argc != 3) {
-        printf("usage: <program> <filever1> <filever2>");
+    if (argc != 5) {
+        printf("usage: <program> <filever1> <filever2> <outputfile.xml> <versionID>\n");
         return 1;
     }
     // load files
-    char* old_file_name = (char*)argv[1];
-    char* new_file_name = (char*)argv[2];
+    char* old_file_name    = (char*)argv[1];
+    char* new_file_name    = (char*)argv[2];
+    char* output_file_name = (char*)argv[3];
+    int   version_id       = atoi(argv[4]);
     struct LoadedFile* old_file = load_from_filename(old_file_name);
     struct LoadedFile* new_file = load_from_filename(new_file_name);
     Substring old_file_content = {.start=old_file->data, .end=old_file->data + old_file->length};
@@ -84,6 +87,15 @@ int main(int argc, const char **argv) {
     struct SubstringWithOriginLineArray filtered = {0};
     Substring curString;
     size_t curLine;
+
+    FILE* output_file = fopen(output_file_name, "w");
+    if (!output_file) {
+        perror("Failed to open output file.\n");
+        return 1;
+    }
+
+    start_version_block(output_file, old_file_name, version_id);
+    start_version_block(stdout, old_file_name, version_id);
 
     for (int i=0; i<unmatched.len; i++) {
         // filter unmatched lines from file 2 by simhash
@@ -362,10 +374,12 @@ int main(int argc, const char **argv) {
             if (maxSplitLines > 1) {
                 // printf("Modified %s at line %zu to %s at %zu - %zu\n", substring_to_cstring(curString), curLine, substring_to_cstring(maxCandidate), maxCandidateLine, maxCandidateLine+maxSplitLines);
                 for (size_t split_start = maxCandidateLine; split_start < maxCandidateLine + maxSplitLines; ++split_start) {
+                    write_location(output_file, curLine, split_start);
                     write_location(stdout, curLine, split_start);
                 }
             } else {
                 // printf("Modified %s at line %zu to %s at %zu\n", substring_to_cstring(curString), curLine, substring_to_cstring(maxCandidate), maxCandidateLine);
+                write_location(output_file, curLine, maxCandidateLine);
                 write_location(stdout, curLine, maxCandidateLine);
             }
             // remove from list of candidates
@@ -386,8 +400,15 @@ int main(int argc, const char **argv) {
         size_t l = allCandidates.lines[k];
 
         // printf("Insert %s at line %zu\n", substring_to_cstring(c), l);
+        write_location(output_file, -1, l);
         write_location(stdout, -1, l);
+
     }
+
+    end_version_block(output_file);
+    end_version_block(stdout);
+
+    fclose(output_file);
     unload_file(old_file);
     unload_file(new_file);
     free_substring_with_origin_line_array(&unmatched);
