@@ -65,8 +65,8 @@ char* substring_to_cstring(Substring s) {
 
 int main(int argc, const char **argv) {
     if (argc != 5) {
-        printf("usage: <program> <filever1> <filever2> <outputfile.xml> <versionID>\n");
-        return 1;
+        printf("usage: %s <filever1> <filever2> <outputfile.xml> <versionID>\n", argv[0]);
+        return EXIT_FAILURE;
     }
     // load files
     char* old_file_name    = (char*)argv[1];
