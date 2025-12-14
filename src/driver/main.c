@@ -90,9 +90,22 @@ int main(int argc, const char **argv) {
 
     FILE* output_file = fopen(output_file_name, "w");
     if (!output_file) {
-        perror("Failed to open output file.\n");
-        return 1;
+        perror("Failed to create/truncate output file.\n");
+        return EXIT_FAILURE;
     }
+
+    if (fclose(output_file)) {
+        perror("Failed to close the output file to change mode. That's... really weird.\n");
+        return EXIT_FAILURE;
+    }
+
+    output_file = fopen(output_file_name, "a");
+    if (!output_file) {
+        perror("Failed to reopen output file in append mode.\n");
+        return EXIT_FAILURE;
+    }
+
+    
 
     start_version_block(output_file, old_file_name, version_id);
     start_version_block(stdout, old_file_name, version_id);
