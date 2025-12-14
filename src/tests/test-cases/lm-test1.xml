@@ -1,0 +1,28 @@
+<TEST NAME="TEST1" FILE="lm-test1.c">
+
+<VERSION NUMBER="1" CHECKED="TRUE">
+
+
+</VERSION>
+
+<VERSION NUMBER="2" CHECKED="TRUE">	 
+
+    <LOCATION ORIG="93" NEW="93" />
+    <LOCATION ORIG="94" NEW="94" />
+    <LOCATION ORIG="95" NEW="95" />
+
+    <LOCATION ORIG="-1" NEW="96" />
+    <LOCATION ORIG="-1" NEW="97" />
+    <LOCATION ORIG="-1" NEW="98" />
+    <LOCATION ORIG="-1" NEW="99" />
+    <LOCATION ORIG="-1" NEW="100" />
+    <LOCATION ORIG="-1" NEW="101" />
+    <LOCATION ORIG="-1" NEW="102" />
+    <LOCATION ORIG="-1" NEW="103" />
+    <LOCATION ORIG="-1" NEW="104" />
+    <LOCATION ORIG="-1" NEW="105" />
+    <LOCATION ORIG="-1" NEW="106" />
+
+
+</VERSION>
+</TEST>
