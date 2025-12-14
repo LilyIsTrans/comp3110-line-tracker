@@ -4,6 +4,7 @@
 #include "../line-diff/distance.h"
 #include "../line-diff/context.h"
 #include "../split-lines/detect-split.h"
+#include "../xml-output/xml-output.h"
 #include "main.h"
 #include <stdio.h>
 
@@ -80,7 +81,7 @@ int main(int argc, const char **argv) {
     struct SubstringWithOriginLineArray unmatched = unmatched_lines(old_file_lines, new_file_lines);
     struct SubstringWithOriginLineArray allCandidates = unmatched_lines(new_file_lines, old_file_lines);
     // iterate through unmatched lines from file 1
-    struct SubstringWithOriginLineArray* filtered;
+    struct SubstringWithOriginLineArray filtered = {0};
     Substring curString;
     size_t curLine;
 
@@ -88,11 +89,8 @@ int main(int argc, const char **argv) {
         // filter unmatched lines from file 2 by simhash
         curString = unmatched.strings[i];
         curLine = unmatched.lines[i];
-        filtered = filterCandidates(&curString, &allCandidates);
-        if (!filtered) {
-            continue;  // Skip to next unmatched line
-        }
-        if (filtered->len == 0) {
+        filtered = filterCandidates(&curString, allCandidates);
+        if (filtered.len == 0) {
             continue;
         }
         // iterate over remaining 15 lines
@@ -110,7 +108,7 @@ int main(int argc, const char **argv) {
             prevContextOrig = false;
         }
 
-        char* origPrevContext[3];
+        char* origPrevContext[3] = {0};
         if (prevContextOrig) {
             Substring* origPrevContextSubstring = &old_file_lines->array[curLine-3];
             bool prevContextOrigOK = true;
@@ -118,7 +116,10 @@ int main(int argc, const char **argv) {
                 origPrevContext[k] = substring_to_cstring(origPrevContextSubstring[k]);
                 if (!origPrevContext[k]) {
                     prevContextOrigOK = false;
-                    for (int m=0; m<k; m++) free(origPrevContext[m]);
+                    for (int m=0; m<k; m++) {
+                        free(origPrevContext[m]);
+                        origPrevContext[m] = 0;
+                    }
                     break;
                 }
             }
@@ -127,15 +128,15 @@ int main(int argc, const char **argv) {
             }
         }
 
-        int candidateCount = min(MAX_CANDIDATES, filtered->len);
+        int candidateCount = min(MAX_CANDIDATES, filtered.len);
         for (int j=0; j<candidateCount; j++) {
             bool prevContext = true;
             bool postContext = true;
-            if (!filtered->strings) {
+            if (!filtered.strings) {
                 break;
             }
-            Substring candidate = filtered->strings[j];
-            size_t candidateLine = filtered->lines[j];
+            Substring candidate = filtered.strings[j];
+            size_t candidateLine = filtered.lines[j];
             if (candidateLine >= new_file_lines->len) {
                 continue;
             }
@@ -143,7 +144,7 @@ int main(int argc, const char **argv) {
                 prevContext = false;
             }
             Substring* candidateInContextSubstring = &new_file_lines->array[candidateLine];
-            char* candidatePrevContext[3];
+            char* candidatePrevContext[3] = {0};
             if (prevContext) {
                 Substring* candidatePrevContextSubstring = &new_file_lines->array[candidateLine-3];
                 bool prevContextOK = true;
@@ -151,7 +152,10 @@ int main(int argc, const char **argv) {
                     candidatePrevContext[k] = substring_to_cstring(candidatePrevContextSubstring[k]);
                     if (!candidatePrevContext[k]) {
                         prevContextOK = false;
-                        for (int m=0; m<k; m++) free(candidatePrevContext[m]);
+                        for (int m=0; m<k; m++) {
+                            free(candidatePrevContext[m]);
+                            candidatePrevContext[m] = 0;
+                        }
                         break;
                     }
                 }
@@ -165,7 +169,7 @@ int main(int argc, const char **argv) {
             singleSimilarity /= curString.end - curString.start;
             singleSimilarity = 1-singleSimilarity;
             // calculates distance for split string
-            double splitSimilarity;
+            double splitSimilarity = 0;
             int best = 0;
             checkSplit(curString, candidateInContextSubstring, min(MAX_SPLIT, new_file_lines->len - candidateLine), &best, &splitSimilarity);
             // compares distances and chooses the closer option
@@ -178,7 +182,7 @@ int main(int argc, const char **argv) {
             if (candidateLine + best + 2 >= new_file_lines->len) {  // Need 3 lines after
                 postContext = false;
             }
-            char* candidatePostContext[3]; 
+            char* candidatePostContext[3] = {0}; 
             if (postContext) {
                 Substring* candidatePostContextSubstring = &new_file_lines->array[candidateLine+best];
                 bool postContextOK = true;
@@ -186,8 +190,14 @@ int main(int argc, const char **argv) {
                     candidatePostContext[k] = substring_to_cstring(candidatePostContextSubstring[k]);
                     if (!candidatePostContext[k]) {
                         postContextOK = false;
-                        for (int m=0; m<3; m++) free(candidatePrevContext[m]);
-                        for (int m=0; m<3; m++) free(candidatePostContext[m]);
+                        for (int m=0; m<3; m++) {
+                            free(candidatePrevContext[m]);
+                            candidatePrevContext[m] = 0;
+                        }
+                        for (int m=0; m<3; m++) {
+                            free(candidatePostContext[m]);
+                            candidatePostContext[m] = 0;
+                        }
                         break;
                     }
                 }
@@ -199,7 +209,7 @@ int main(int argc, const char **argv) {
             if (curLine + best + 2 >= old_file_lines->len) {  // Need 3 lines after
                 postContextOrig = false;
             }
-            char* origPostContext[3]; 
+            char* origPostContext[3] = {0}; 
             if (postContextOrig) {
                 Substring* origPostContextSubstring = &old_file_lines->array[curLine+best];
                 bool postContextOrigOK = true;
@@ -207,8 +217,14 @@ int main(int argc, const char **argv) {
                     origPostContext[k] = substring_to_cstring(origPostContextSubstring[k]);
                     if (!origPostContext[k]) {
                         postContextOrigOK = false;
-                        for (int m=0; m<3; m++) free(origPrevContext[m]);
-                        for (int m=0; m<3; m++) free(origPostContext[m]);
+                        for (int m=0; m<3; m++) {
+                            free(origPrevContext[m]);
+                            origPrevContext[m] = 0;
+                        }
+                        for (int m=0; m<3; m++) {
+                            free(origPostContext[m]);
+                            origPostContext[m] = 0;
+                        }
                         break;
                     }
                 }
@@ -222,6 +238,10 @@ int main(int argc, const char **argv) {
             char* postCombined = NULL;
             if (prevContext) {
                 prevCombined = combineStrings(candidatePrevContext, 3);
+                for (int m=0; m<3; m++) {
+                    free(candidatePrevContext[m]);
+                    candidatePrevContext[m] = 0;
+                }
                 if (!prevCombined) {
                     for (int k=0; k<3; k++) free(candidatePrevContext[k]);
                     continue;
@@ -229,11 +249,18 @@ int main(int argc, const char **argv) {
             }
             if (postContext) {
                 postCombined = combineStrings(candidatePostContext, 3);
+                for (int m=0; m<3; m++) {
+                    free(candidatePostContext[m]);
+                    candidatePostContext[m] = 0;
+                }
                 if (!postCombined) {
                     if (prevCombined) free(prevCombined);
                     for (int k=0; k<3; k++) {
                         free(candidatePrevContext[k]);
+                        candidatePrevContext[k] = 0;
+                        
                         free(candidatePostContext[k]);
+                        candidatePostContext[k] = 0;
                     }
                     continue;
                 }
@@ -243,38 +270,72 @@ int main(int argc, const char **argv) {
             char* postCombinedOrig = NULL;
             if (prevContextOrig) {  // Check orig context flag, not candidate flag
                 prevCombinedOrig = combineStrings(origPrevContext, 3);
+                for (int m=0; m<3; m++) {
+                    free(origPrevContext[m]);
+                    origPrevContext[m] = 0;
+                }
                 if (!prevCombinedOrig) {
-                    if (prevCombined) free(prevCombined);
-                    if (postCombined) free(postCombined);
+                    if (prevCombined) {
+                        free(prevCombined);
+                        prevCombined = NULL;
+                    }
+                    if (postCombined) {
+                        free(postCombined);
+                        postCombined = NULL;
+                    }
                     for (int k=0; k<3; k++) {
                         free(candidatePrevContext[k]);
+                        candidatePrevContext[k] = 0;
+
                         free(candidatePostContext[k]);
+                        candidatePostContext[k] = 0;
                     }
                     continue;
                 }
             }
             if (postContextOrig) {  // Check orig context flag, not candidate flag
                 postCombinedOrig = combineStrings(origPostContext, 3);
+                for (int m=0; m<3; m++) {
+                    free(origPostContext[m]);
+                    origPostContext[m] = 0;
+                }
                 if (!postCombinedOrig) {
                     if (prevCombined) free(prevCombined);
                     if (postCombined) free(postCombined);
                     if (prevCombinedOrig) free(prevCombinedOrig);
                     for (int k=0; k<3; k++) {
                         free(candidatePrevContext[k]);
+                        candidatePrevContext[k] = 0;
+                        
                         free(candidatePostContext[k]);
+                        candidatePostContext[k] = 0;
+                        
                         free(origPrevContext[k]);
+                        origPrevContext[k] = 0;
                     }
                     continue;
                 }
             }
 
-            double prevContextSimilarity;
-            double postContextSimilarity;
+            double prevContextSimilarity = 0;
+            double postContextSimilarity = 0;
             if (prevContext && prevContextOrig) prevContextSimilarity = cosine_similarity(prevCombined, prevCombinedOrig);
             if (postContext && postContextOrig) postContextSimilarity = cosine_similarity(postCombined, postCombinedOrig);
+            free(prevCombinedOrig);
+            prevCombinedOrig = 0;
+            free(postCombinedOrig);
+            postCombinedOrig = 0;
+            if (prevCombined) {
+                free(prevCombined);
+                prevCombined = NULL;
+            }
+            if (postCombined) {
+                free(postCombined);
+                postCombined = NULL;
+            }
             int divisor = 2;
-            double similarity;
-            double contextSimilarity; 
+            double similarity = 0;
+            double contextSimilarity = 0; 
             if (!prevContext && !postContext) {
                 similarity = ((split)? splitSimilarity : singleSimilarity);
             } else if (!prevContext) {
@@ -290,20 +351,22 @@ int main(int argc, const char **argv) {
                 similarity = 0.6 * ((split)? splitSimilarity : singleSimilarity) + contextSimilarity;
             }
             // based on combined values of levenshtein distance and cosine similarity, determine the closest candidate
-            if (similarity > maxSimilarity) {
-                maxSimilarity = similarity;
-                maxCandidate = candidate;
-                maxCandidateLine = candidateLine;
-                maxSplitLines = best;
-            }
+            maxCandidate = similarity > maxSimilarity ? candidate : maxCandidate;
+            maxCandidateLine = similarity > maxSimilarity ? candidateLine : maxCandidateLine;
+            maxSplitLines = similarity > maxSimilarity ? best : maxSplitLines;
+            maxSimilarity = similarity > maxSimilarity ? similarity : maxSimilarity;
         }
         // if the closest candidate is above some threshold, they are a match
         if (maxSimilarity > MIN_SIMILARITY) {
             // match
             if (maxSplitLines > 1) {
-                printf("Modified %s at line %zu to %s at %zu - %zu\n", substring_to_cstring(curString), curLine, substring_to_cstring(maxCandidate), maxCandidateLine, maxCandidateLine+maxSplitLines);
+                // printf("Modified %s at line %zu to %s at %zu - %zu\n", substring_to_cstring(curString), curLine, substring_to_cstring(maxCandidate), maxCandidateLine, maxCandidateLine+maxSplitLines);
+                for (size_t split_start = maxCandidateLine; split_start < maxCandidateLine + maxSplitLines; ++split_start) {
+                    write_location(stdout, curLine, split_start);
+                }
             } else {
-                printf("Modified %s at line %zu to %s at %zu\n", substring_to_cstring(curString), curLine, substring_to_cstring(maxCandidate), maxCandidateLine);
+                // printf("Modified %s at line %zu to %s at %zu\n", substring_to_cstring(curString), curLine, substring_to_cstring(maxCandidate), maxCandidateLine);
+                write_location(stdout, curLine, maxCandidateLine);
             }
             // remove from list of candidates
             for (int k=0; k<maxSplitLines; k++) {
@@ -311,17 +374,26 @@ int main(int argc, const char **argv) {
             }
         } else { // if not, the line is removed in version 2
             // removal
-            printf("Remove %s from line %zu\n", substring_to_cstring(curString), curLine);
+            // printf("Remove %s from line %zu\n", substring_to_cstring(curString), curLine);
+            write_location(stdout, curLine, -1);
             // no effect on candidates
         }
+        free_substring_with_origin_line_array(&filtered);
     }
     // any remaining lines in version 2 are insertions
     for (size_t k = 0; k<allCandidates.len; k++) {
         Substring c = allCandidates.strings[k];
         size_t l = allCandidates.lines[k];
 
-        printf("Insert %s at line %zu\n", substring_to_cstring(c), l);
+        // printf("Insert %s at line %zu\n", substring_to_cstring(c), l);
+        write_location(stdout, -1, l);
     }
+    unload_file(old_file);
+    unload_file(new_file);
+    free_substring_with_origin_line_array(&unmatched);
+    free_substring_with_origin_line_array(&allCandidates);
+    free(old_file_lines);
+    free(new_file_lines);
 
     return 0;
 }

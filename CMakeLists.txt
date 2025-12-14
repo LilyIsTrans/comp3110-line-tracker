@@ -25,7 +25,7 @@ endif()
 include(CheckCCompilerFlag)
 CHECK_C_COMPILER_FLAG("-mtune=native" COMPILER_SUPPORTS_MTUNE_NATIVE)
 if(COMPILER_SUPPORTS_MTUNE_NATIVE)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mtune=native")
 endif()
 
 

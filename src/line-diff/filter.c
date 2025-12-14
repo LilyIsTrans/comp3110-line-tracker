@@ -48,11 +48,11 @@ int hammingDistance(uint32_t a, uint32_t b) {
     return dist;
 }
 
-struct SubstringWithOriginLineArray* filterCandidates(Substring *str, struct SubstringWithOriginLineArray *candidates) {
-    struct SubstringWithOriginLineArray* filtered = malloc(sizeof(struct SubstringWithOriginLineArray));
-    malloc_substring_with_origin_line_array(filtered, MAX_CANDIDATES);
-    Substring *res = filtered->strings;
-    size_t *lines = filtered->lines;
+struct SubstringWithOriginLineArray filterCandidates(Substring *str, struct SubstringWithOriginLineArray candidates) {
+    struct SubstringWithOriginLineArray filtered = {0};
+    malloc_substring_with_origin_line_array(&filtered, MAX_CANDIDATES);
+    Substring *res = filtered.strings;
+    size_t *lines = filtered.lines;
     int resDist[MAX_CANDIDATES];
     
     // Initialize all to -1
@@ -60,12 +60,12 @@ struct SubstringWithOriginLineArray* filterCandidates(Substring *str, struct Sub
         resDist[i] = -1;
     }
     
-    int filled = 0;
+    size_t filled = 0;
     Substring candidate;
     size_t line;
-    for (int i = 0; i < candidates->len; i++) {
-        candidate = candidates->strings[i];
-        line = candidates->lines[i];
+    for (int i = 0; i < candidates.len; i++) {
+        candidate = candidates.strings[i];
+        line = candidates.lines[i];
         int dist = hammingDistance(simhash(str), simhash(&candidate));
         
         // If we haven't filled the array yet, just add it
@@ -106,7 +106,8 @@ struct SubstringWithOriginLineArray* filterCandidates(Substring *str, struct Sub
         }
     }
     
-    filtered->len = filled;
+    filtered.len = filled;
+    realloc_substring_with_origin_line_array(&filtered, filled);
     return filtered;
 }
 /*

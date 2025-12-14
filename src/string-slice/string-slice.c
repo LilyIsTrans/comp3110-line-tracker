@@ -1,5 +1,6 @@
 #include "string-slice.h"
 #include <assert.h>
+#include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -449,6 +450,15 @@ void free_substring_with_origin_line_array(
   free(arr->strings);
 }
 
+bool is_all_whitespace(Substring str) {
+  for (const char* cursor = str.start; cursor < str.end; ++cursor) {
+    if (!isblank(*cursor)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /// Returns an array of lines from `old_file_lines` which were found nowhere in
 /// `new_file_lines`
 struct SubstringWithOriginLineArray 
@@ -471,7 +481,7 @@ unmatched_lines(struct SubstringArray *old_file_lines,
   }
   
   for (size_t i = 0; i < new_file_lines->len; ++i) {
-    if (new_file_lines->array[i].end != new_file_lines->array[i].start) {
+    if (is_all_whitespace(new_file_lines->array[i])) {
       size_t *I = malloc(sizeof(size_t));
       *I = i;
       
